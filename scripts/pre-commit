@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "*****Running lint check******"
+
+git stash -q --keep-index
+
+./gradlew check
+
+status=$?
+
+git stash pop -q
+
+echo "*****Done with lint check******"
+
+exit $status
