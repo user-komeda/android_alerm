@@ -51,7 +51,7 @@ fun HomeScreen(
             items(3) { alarm ->
                 HomeListItem(
                     alarm = null,
-                    onClickItem = {}
+                    onClickItem = navigateToDetail
                 )
             }
         }

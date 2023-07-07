@@ -5,6 +5,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.androidAlarm.ui.screens.detail.DetailScreen
+import com.example.androidAlarm.ui.screens.detail.DetailViewModel
 import com.example.androidAlarm.ui.screens.home.HomeScreen
 import com.example.androidAlarm.ui.screens.home.HomeViewModel
 
@@ -19,6 +21,10 @@ fun NavHost(navController: NavHostController) {
                     navController.navigate(AlarmDestination.HOME_DETAIL.name)
                 }
             )
+        }
+        composable(route = AlarmDestination.HOME_DETAIL.name) {
+            val detailViewModel: DetailViewModel = hiltViewModel<DetailViewModel>()
+            DetailScreen(detailViewModel = detailViewModel)
         }
     }
 }

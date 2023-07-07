@@ -85,6 +85,8 @@ dependencies {
     implementation "com.google.dagger:hilt-android:2.44"
     implementation 'androidx.core:core-ktx:1.10.1'
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.0")
+    detektPlugins("ru.kode:detekt-rules-compose:1.2.2")
+    detektPlugins "io.nlopez.compose.rules:detekt:0.1.11"
     kapt "com.google.dagger:hilt-compiler:2.44"
     implementation 'androidx.hilt:hilt-navigation-compose:1.1.0-alpha01'
     testImplementation 'junit:junit:4.13.2'
