@@ -36,14 +36,16 @@ import com.example.androidalerm.R
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
-    navigateToDetail: () -> Unit
+    navigateToDetail: () -> Unit,
+    navigateToConfig: () -> Unit
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
     Scaffold(
         topBar = {
             AppBar(
                 { homeViewModel.update() },
-                isShowDropDownMenu = uiState.isShowDropDownMenu
+                isShowDropDownMenu = uiState.isShowDropDownMenu,
+                navigateToConfig
             )
         }
     ) {
@@ -60,7 +62,11 @@ fun HomeScreen(
 
 @Preview
 @Composable
-private fun AppBar(onClickItem: () -> Unit = {}, isShowDropDownMenu: Boolean = false) {
+private fun AppBar(
+    onClickItem: () -> Unit = {},
+    isShowDropDownMenu: Boolean = false,
+    navigateToConfig: () -> Unit = {}
+) {
     TopAppBar(
         title = {
             Text(text = "スマートアラーム")
@@ -70,9 +76,11 @@ private fun AppBar(onClickItem: () -> Unit = {}, isShowDropDownMenu: Boolean = f
                 Icon(imageVector = Icons.Default.MoreVert, contentDescription = "MoreVert")
             }
             DropdownMenu(expanded = isShowDropDownMenu, onDismissRequest = onClickItem) {
-                DropdownMenuItem(text = { Text(text = "abc") }, onClick = { /*TODO*/ })
-                DropdownMenuItem(text = { Text(text = "def") }, onClick = { /*TODO*/ })
-                DropdownMenuItem(text = { Text(text = "ghi") }, onClick = { /*TODO*/ })
+                DropdownMenuItem(text = { Text(text = "クイックタイマー") }, onClick = { /*TODO*/ })
+                DropdownMenuItem(text = { Text(text = "設定") }, onClick = navigateToConfig)
+                DropdownMenuItem(text = { Text(text = "指定日の設定") }, onClick = { /*TODO*/ })
+                DropdownMenuItem(text = { Text(text = "アラーム一括切り替え") }, onClick = { /*TODO*/ })
+                DropdownMenuItem(text = { Text(text = "アラームを削除") }, onClick = { /*TODO*/ })
             }
         },
         modifier = Modifier.background(Color.White)
