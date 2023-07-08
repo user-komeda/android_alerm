@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -28,7 +29,8 @@ import com.example.androidAlarm.model.ConfigItem
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ConfigScreen(
-    configViewModel: ConfigViewModel
+    configViewModel: ConfigViewModel,
+    navigateToDetailConfig: () -> Unit
 ) {
     val uiState by configViewModel.uiState.collectAsState()
     val configItem = ConfigItem()
@@ -36,13 +38,15 @@ fun ConfigScreen(
         topBar = {
             AppBar(
                 onClickItem = { configViewModel.update() },
-                isShowDropDownMenu = uiState.isShowDropDownMenu
+                isShowDropDownMenu = uiState.isShowDropDownMenu,
+                navigateToDetailConfig
             )
         }
     ) {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(configItem.itemList) {
                 ConfigListItem(it, {})
+                Divider()
             }
         }
     }
@@ -51,7 +55,8 @@ fun ConfigScreen(
 @Composable
 fun AppBar(
     onClickItem: () -> Unit,
-    isShowDropDownMenu: Boolean
+    isShowDropDownMenu: Boolean,
+    navigateToDetailConfig: () -> Unit
 ) {
     TopAppBar(
         title = {
@@ -62,7 +67,10 @@ fun AppBar(
                 Icon(imageVector = Icons.Default.MoreVert, contentDescription = "MoreVert")
             }
             DropdownMenu(expanded = isShowDropDownMenu, onDismissRequest = onClickItem) {
-                DropdownMenuItem(text = { Text(text = "追加設定") }, onClick = { /*TODO*/ })
+                DropdownMenuItem(
+                    text = { Text(text = "追加設定") },
+                    onClick = navigateToDetailConfig
+                )
             }
         },
         modifier = Modifier.background(Color.White)
