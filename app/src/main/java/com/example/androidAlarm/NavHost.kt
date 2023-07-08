@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.androidAlarm.ui.screens.config.ConfigScreen
 import com.example.androidAlarm.ui.screens.config.ConfigViewModel
+import com.example.androidAlarm.ui.screens.configDetail.ConfigDetailScreen
+import com.example.androidAlarm.ui.screens.configDetail.ConfigDetailViewModel
 import com.example.androidAlarm.ui.screens.detail.DetailScreen
 import com.example.androidAlarm.ui.screens.detail.DetailViewModel
 import com.example.androidAlarm.ui.screens.home.HomeScreen
@@ -33,7 +35,15 @@ fun NavHost(navController: NavHostController) {
         }
         composable(route = AlarmDestination.CONFIG.name) {
             val configViewModel: ConfigViewModel = hiltViewModel<ConfigViewModel>()
-            ConfigScreen(configViewModel = configViewModel)
+            ConfigScreen(
+                configViewModel = configViewModel,
+                navigateToDetailConfig = { navController.navigate(AlarmDestination.CONFIG_DETAIL.name) }
+            )
+        }
+        composable(route = AlarmDestination.CONFIG_DETAIL.name) {
+            val configDetailViewModel: ConfigDetailViewModel =
+                hiltViewModel<ConfigDetailViewModel>()
+            ConfigDetailScreen(configDetailViewModel = configDetailViewModel)
         }
     }
 }
