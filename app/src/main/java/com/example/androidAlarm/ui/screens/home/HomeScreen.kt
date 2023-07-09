@@ -38,18 +38,18 @@ import com.example.androidalerm.R
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
     navigateToDetail: () -> Unit,
-    navigateToConfig: () -> Unit
+    navigateToConfig: () -> Unit,
+    navigateToDestinationDate: () -> Unit
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
-    Scaffold(
-        topBar = {
-            AppBar(
-                { homeViewModel.update() },
-                isShowDropDownMenu = uiState.isShowDropDownMenu,
-                navigateToConfig
-            )
-        }
-    ) {
+    Scaffold(topBar = {
+        AppBar(
+            { homeViewModel.update() },
+            isShowDropDownMenu = uiState.isShowDropDownMenu,
+            navigateToConfig,
+            navigateToDestinationDate
+        )
+    }) {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(3) { alarm ->
                 HomeListItem(
@@ -67,7 +67,8 @@ fun HomeScreen(
 private fun AppBar(
     onClickItem: () -> Unit = {},
     isShowDropDownMenu: Boolean = false,
-    navigateToConfig: () -> Unit = {}
+    navigateToConfig: () -> Unit = {},
+    navigateToDestinationDate: () -> Unit
 ) {
     TopAppBar(
         title = {
@@ -80,7 +81,10 @@ private fun AppBar(
             DropdownMenu(expanded = isShowDropDownMenu, onDismissRequest = onClickItem) {
                 DropdownMenuItem(text = { Text(text = "クイックタイマー") }, onClick = { /*TODO*/ })
                 DropdownMenuItem(text = { Text(text = "設定") }, onClick = navigateToConfig)
-                DropdownMenuItem(text = { Text(text = "指定日の設定") }, onClick = { /*TODO*/ })
+                DropdownMenuItem(
+                    text = { Text(text = "指定日の設定") },
+                    onClick = navigateToDestinationDate
+                )
                 DropdownMenuItem(text = { Text(text = "アラーム一括切り替え") }, onClick = { /*TODO*/ })
                 DropdownMenuItem(text = { Text(text = "アラームを削除") }, onClick = { /*TODO*/ })
             }

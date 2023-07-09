@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,7 +15,6 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     val uiState: StateFlow<HomeState> = _uiState.asStateFlow()
 
     fun update() {
-        Timber.d("aaa")
         _uiState.update {
             it.copy(
                 isShowDropDownMenu = !_uiState.value.isShowDropDownMenu

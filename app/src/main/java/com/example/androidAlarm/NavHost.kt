@@ -9,6 +9,8 @@ import com.example.androidAlarm.ui.screens.config.ConfigScreen
 import com.example.androidAlarm.ui.screens.config.ConfigViewModel
 import com.example.androidAlarm.ui.screens.configDetail.ConfigDetailScreen
 import com.example.androidAlarm.ui.screens.configDetail.ConfigDetailViewModel
+import com.example.androidAlarm.ui.screens.designatedDate.DesignatedDateScreen
+import com.example.androidAlarm.ui.screens.designatedDate.DesignatedDateViewModel
 import com.example.androidAlarm.ui.screens.detail.DetailScreen
 import com.example.androidAlarm.ui.screens.detail.DetailViewModel
 import com.example.androidAlarm.ui.screens.home.HomeScreen
@@ -26,6 +28,9 @@ fun NavHost(navController: NavHostController) {
                 },
                 navigateToConfig = {
                     navController.navigate(AlarmDestination.CONFIG.name)
+                },
+                navigateToDestinationDate = {
+                    navController.navigate(AlarmDestination.DESIGNATED_DATE.name)
                 }
             )
         }
@@ -44,6 +49,11 @@ fun NavHost(navController: NavHostController) {
             val configDetailViewModel: ConfigDetailViewModel =
                 hiltViewModel<ConfigDetailViewModel>()
             ConfigDetailScreen(configDetailViewModel = configDetailViewModel)
+        }
+        composable(route = AlarmDestination.DESIGNATED_DATE.name) {
+            val designatedDateViewModel: DesignatedDateViewModel =
+                hiltViewModel<DesignatedDateViewModel>()
+            DesignatedDateScreen(designatedDateViewModel = designatedDateViewModel)
         }
     }
 }
