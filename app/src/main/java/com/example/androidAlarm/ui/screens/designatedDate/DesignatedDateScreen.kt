@@ -30,11 +30,12 @@ import com.example.androidAlarm.model.DesignatedDateGroup
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun DesignatedDateScreen(
-    designatedDateViewModel: DesignatedDateViewModel
+    designatedDateViewModel: DesignatedDateViewModel,
+    navigateToCalendar: () -> Unit
 ) {
     Scaffold(
         topBar = { AppBar() },
-        bottomBar = { BottomBar() }
+        bottomBar = { BottomBar(navigateToCalendar) }
     ) {
         val uiState = designatedDateViewModel.uiState.collectAsState()
         TabLayout(
@@ -55,7 +56,7 @@ fun AppBar() {
 }
 
 @Composable
-fun BottomBar() {
+fun BottomBar(navigateToCalendar: () -> Unit) {
     Column {
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -77,7 +78,7 @@ fun BottomBar() {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            TextButton(modifier = Modifier.weight(1f), onClick = { /*TODO*/ }) {
+            TextButton(modifier = Modifier.weight(1f), onClick = navigateToCalendar) {
                 Text(text = "カレンダーから選択")
             }
             TextButton(modifier = Modifier.weight(1f), onClick = { /*TODO*/ }) {
