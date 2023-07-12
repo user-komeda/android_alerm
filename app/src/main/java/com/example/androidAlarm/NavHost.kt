@@ -5,6 +5,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.androidAlarm.ui.screens.calendar.CalendarScreen
 import com.example.androidAlarm.ui.screens.config.ConfigScreen
 import com.example.androidAlarm.ui.screens.config.ConfigViewModel
 import com.example.androidAlarm.ui.screens.configDetail.ConfigDetailScreen
@@ -53,7 +54,13 @@ fun NavHost(navController: NavHostController) {
         composable(route = AlarmDestination.DESIGNATED_DATE.name) {
             val designatedDateViewModel: DesignatedDateViewModel =
                 hiltViewModel<DesignatedDateViewModel>()
-            DesignatedDateScreen(designatedDateViewModel = designatedDateViewModel)
+            DesignatedDateScreen(
+                designatedDateViewModel = designatedDateViewModel,
+                navigateToCalendar = { navController.navigate(AlarmDestination.CALENDAR.name) }
+            )
+        }
+        composable(route = AlarmDestination.CALENDAR.name) {
+            CalendarScreen()
         }
     }
 }
