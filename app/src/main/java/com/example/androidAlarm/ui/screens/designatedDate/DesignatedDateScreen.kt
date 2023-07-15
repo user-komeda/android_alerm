@@ -35,7 +35,7 @@ fun DesignatedDateScreen(
 ) {
     Scaffold(
         topBar = { AppBar() },
-        bottomBar = { BottomBar(navigateToCalendar) }
+        bottomBar = { BottomBar(navigateToCalendar, designatedDateViewModel) }
     ) {
         val uiState = designatedDateViewModel.uiState.collectAsState()
         TabLayout(
@@ -56,7 +56,7 @@ fun AppBar() {
 }
 
 @Composable
-fun BottomBar(navigateToCalendar: () -> Unit) {
+fun BottomBar(navigateToCalendar: () -> Unit, designatedDateViewModel: DesignatedDateViewModel) {
     Column {
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -67,7 +67,7 @@ fun BottomBar(navigateToCalendar: () -> Unit) {
             TextButton(modifier = Modifier.weight(1f), onClick = { /*TODO*/ }) {
                 Text(text = "追加")
             }
-            TextButton(modifier = Modifier.weight(1f), onClick = { /*TODO*/ }) {
+            TextButton(modifier = Modifier.weight(1f), onClick = { designatedDateViewModel.getData(1) }) {
                 Text(text = "祝日の取得")
             }
             TextButton(modifier = Modifier.weight(1f), onClick = { /*TODO*/ }) {
