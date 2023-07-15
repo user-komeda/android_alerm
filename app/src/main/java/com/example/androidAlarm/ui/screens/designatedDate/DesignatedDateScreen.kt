@@ -35,7 +35,7 @@ fun DesignatedDateScreen(
 ) {
     Scaffold(
         topBar = { AppBar() },
-        bottomBar = { BottomBar(navigateToCalendar) }
+        bottomBar = { BottomBar(navigateToCalendar, designatedDateViewModel) }
     ) {
         val uiState = designatedDateViewModel.uiState.collectAsState()
         TabLayout(
@@ -56,7 +56,7 @@ fun AppBar() {
 }
 
 @Composable
-fun BottomBar(navigateToCalendar: () -> Unit) {
+fun BottomBar(navigateToCalendar: () -> Unit, designatedDateViewModel: DesignatedDateViewModel) {
     Column {
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -67,7 +67,10 @@ fun BottomBar(navigateToCalendar: () -> Unit) {
             TextButton(modifier = Modifier.weight(1f), onClick = { /*TODO*/ }) {
                 Text(text = "追加")
             }
-            TextButton(modifier = Modifier.weight(1f), onClick = { /*TODO*/ }) {
+            TextButton(
+                modifier = Modifier.weight(1f),
+                onClick = { designatedDateViewModel.getData() }
+            ) {
                 Text(text = "祝日の取得")
             }
             TextButton(modifier = Modifier.weight(1f), onClick = { /*TODO*/ }) {
@@ -90,7 +93,8 @@ fun BottomBar(navigateToCalendar: () -> Unit) {
 
 @Composable
 fun DesignatedDateList(
-    item: String
+    item: String,
+    itemMap: Map<String, String>
 ) {
     Row(
         modifier = Modifier
@@ -98,6 +102,7 @@ fun DesignatedDateList(
             .fillMaxWidth()
     ) {
         Text(text = item)
+        itemMap[item]?.let { Text(text = it) }
     }
 }
 
@@ -105,7 +110,7 @@ fun DesignatedDateList(
 fun TabLayout(
     selectTabIndex: Int,
     designatedDateViewModel: DesignatedDateViewModel,
-    designatedDateMap: Map<DesignatedDateGroup, List<String>>
+    designatedDateMap: Map<DesignatedDateGroup, Map<String, String>>
 ) {
     val keyList: List<DesignatedDateGroup> = DesignatedDateState().designatedDateMap.keys.toList()
     Column(
@@ -124,8 +129,8 @@ fun TabLayout(
             }
         }
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(designatedDateMap[keyList[selectTabIndex]]!!) {
-                DesignatedDateList(it)
+            items(designatedDateMap[keyList[selectTabIndex]]!!.keys.toList()) {
+                DesignatedDateList(it, designatedDateMap[keyList[selectTabIndex]]!!)
                 Divider()
             }
         }
