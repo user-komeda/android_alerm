@@ -5,6 +5,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import timber.log.Timber
 import javax.inject.Inject
 
 private interface NationalHolidayApi {
@@ -23,6 +24,7 @@ class NationalHolidayDataSourceImpl @Inject constructor(
             ).build().create(NationalHolidayApi::class.java)
 
     override suspend fun getNationalHoliday(): Response<Map<String, String>> {
+        Timber.d(networkApi.getNationalHoliday().toString())
         return networkApi.getNationalHoliday()
     }
 }
