@@ -6,5 +6,6 @@ import com.example.androidAlarm.model.DropDownItem
 data class HomeState(
     val isShowDropDownMenu: Boolean = false,
     val alarmList: List<Alarm> = ArrayList(),
-    val dropItemList: List<DropDownItem> = ArrayList()
+    val dropItemList: List<DropDownItem> = ArrayList(),
+    val isShowDialogMenu: Boolean = false,
 )
