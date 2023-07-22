@@ -3,10 +3,7 @@
 package com.example.androidAlarm.ui.screens.home
 
 import android.annotation.SuppressLint
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -40,15 +38,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.content.ContextCompat.startForegroundService
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidAlarm.model.Alarm
 import com.example.androidAlarm.model.HomeModalItem
-import com.example.androidAlarm.util.AlarmBroadcastReceiver
 import com.example.androidalerm.R
-import timber.log.Timber
-import java.util.Calendar
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -59,7 +52,6 @@ fun HomeScreen(
     navigateToDestinationDate: () -> Unit
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
-    val homeModalItem = HomeModalItem()
     val context: Context = LocalContext.current
 
     Scaffold(topBar = {
@@ -68,7 +60,6 @@ fun HomeScreen(
             isShowDropDownMenu = uiState.isShowDropDownMenu,
             navigateToConfig,
             navigateToDestinationDate,
-
         )
     }) {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
@@ -81,7 +72,12 @@ fun HomeScreen(
             }
         }
         if (!uiState.isShowDropDownMenu) {
-            HomeModalView(homeModalItem, {})
+            HomeModalView(onClickItem = { selectTime: Int ->
+                homeViewModel.selectTime(
+                    selectTime,
+                    context
+                )
+            }, uiState = uiState)
         }
     }
 }
@@ -143,12 +139,10 @@ private fun HomeListItem(
 
 @Composable
 private fun HomeModalView(
-    homeModalItem: HomeModalItem,
-    onClickItem: () -> Unit
+    onClickItem: (selectTime: Int) -> Unit,
+    uiState: HomeState
 ) {
-    abc(LocalContext.current)
-    Dialog(onDismissRequest = {
-    }) {
+    Dialog(onDismissRequest = {}) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -156,12 +150,16 @@ private fun HomeModalView(
             shape = RoundedCornerShape(size = 10.dp)
         ) {
             LazyColumn(
-                Modifier
-                    .fillMaxWidth()
+                Modifier.fillMaxWidth()
             ) {
-                items(homeModalItem.homeModalItem) {
-                    Row(Modifier.clickable(onClick = onClickItem)) {
-                        Text(text = it)
+                items(HomeModalItem.values()) {
+                    Row(
+                        Modifier.selectable(
+                            selected = it.alarmTime == uiState.selectedAlarmTime,
+                            onClick = { onClickItem(it.alarmTime) }
+                        )
+                    ) {
+                        Text(text = it.viewItem)
                     }
                     Divider()
                 }
@@ -171,28 +169,5 @@ private fun HomeModalView(
 
     Button({}) {
         Text(text = "OPEN")
-    }
-}
-
-fun abc(context: Context) {
-    Timber.d("aaaaaaaaaaaaa")
-    val calendar: Calendar = Calendar.getInstance()
-    calendar.timeInMillis = System.currentTimeMillis()
-    calendar.add(Calendar.SECOND, 5)
-    val intent: Intent = Intent(context, AlarmBroadcastReceiver::class.java)
-    val pendingIntent: PendingIntent = PendingIntent.getBroadcast(
-        context,
-        1,
-        intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
-    val alarm = getSystemService(
-        context,
-        AlarmManager::class.java
-    )
-    if (alarm != null) {
-        Timber.d("CCCCCCCCCCCCCCCCCCCC")
-        alarm.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
-        startForegroundService(context, intent)
     }
 }
