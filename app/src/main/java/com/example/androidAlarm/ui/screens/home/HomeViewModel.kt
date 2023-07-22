@@ -33,7 +33,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     fun updateShowModalFlag() {
         _uiState.update {
             it.copy(
-                isShowDialogMenu = !_uiState.value.isShowDialogMenu
+                isShowModal = !_uiState.value.isShowModal
             )
         }
     }

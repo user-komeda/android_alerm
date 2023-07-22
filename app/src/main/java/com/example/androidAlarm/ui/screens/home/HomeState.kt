@@ -7,6 +7,6 @@ data class HomeState(
     val isShowDropDownMenu: Boolean = false,
     val alarmList: List<Alarm> = ArrayList(),
     val dropItemList: List<DropDownItem> = ArrayList(),
-    val isShowDialogMenu: Boolean = false,
+    val isShowModal: Boolean = false,
     val selectedAlarmTime: Int = 0
 )

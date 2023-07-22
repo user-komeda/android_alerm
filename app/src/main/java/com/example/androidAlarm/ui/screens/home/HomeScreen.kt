@@ -3,7 +3,6 @@
 package com.example.androidAlarm.ui.screens.home
 
 import android.annotation.SuppressLint
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -52,11 +52,10 @@ fun HomeScreen(
     navigateToDestinationDate: () -> Unit
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
-    val context: Context = LocalContext.current
 
     Scaffold(topBar = {
         AppBar(
-            { homeViewModel.update() },
+            homeViewModel,
             isShowDropDownMenu = uiState.isShowDropDownMenu,
             navigateToConfig,
             navigateToDestinationDate,
@@ -71,13 +70,8 @@ fun HomeScreen(
                 Divider()
             }
         }
-        if (!uiState.isShowDropDownMenu) {
-            HomeModalView(onClickItem = { selectTime: Int ->
-                homeViewModel.selectTime(
-                    selectTime,
-                    context
-                )
-            }, uiState = uiState)
+        if (uiState.isShowModal) {
+            HomeModalView(homeViewModel = homeViewModel, uiState = uiState)
         }
     }
 }
@@ -85,7 +79,7 @@ fun HomeScreen(
 @Preview
 @Composable
 private fun AppBar(
-    onClickItem: () -> Unit = {},
+    homeViewModel: HomeViewModel,
     isShowDropDownMenu: Boolean = false,
     navigateToConfig: () -> Unit = {},
     navigateToDestinationDate: () -> Unit
@@ -95,11 +89,17 @@ private fun AppBar(
             Text(text = "スマートアラーム")
         },
         actions = {
-            IconButton(onClick = onClickItem) {
+            IconButton(onClick = { homeViewModel.update() }) {
                 Icon(imageVector = Icons.Default.MoreVert, contentDescription = "MoreVert")
             }
-            DropdownMenu(expanded = isShowDropDownMenu, onDismissRequest = onClickItem) {
-                DropdownMenuItem(text = { Text(text = "クイックタイマー") }, onClick = { /*TODO*/ })
+            DropdownMenu(
+                expanded = isShowDropDownMenu,
+                onDismissRequest = { homeViewModel.update() }
+            ) {
+                DropdownMenuItem(
+                    text = { Text(text = "クイックタイマー") },
+                    onClick = { homeViewModel.updateShowModalFlag() }
+                )
                 DropdownMenuItem(text = { Text(text = "設定") }, onClick = navigateToConfig)
                 DropdownMenuItem(
                     text = { Text(text = "指定日の設定") },
@@ -139,10 +139,11 @@ private fun HomeListItem(
 
 @Composable
 private fun HomeModalView(
-    onClickItem: (selectTime: Int) -> Unit,
+    homeViewModel: HomeViewModel,
     uiState: HomeState
 ) {
-    Dialog(onDismissRequest = {}) {
+    val context = LocalContext.current
+    Dialog(onDismissRequest = { homeViewModel.updateShowModalFlag() }) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -154,10 +155,12 @@ private fun HomeModalView(
             ) {
                 items(HomeModalItem.values()) {
                     Row(
-                        Modifier.selectable(
-                            selected = it.alarmTime == uiState.selectedAlarmTime,
-                            onClick = { onClickItem(it.alarmTime) }
-                        )
+                        Modifier
+                            .selectable(
+                                selected = it.alarmTime == uiState.selectedAlarmTime,
+                                onClick = { homeViewModel.selectTime(it.alarmTime, context) }
+                            )
+                            .fillMaxWidth().size(24.dp)
                     ) {
                         Text(text = it.viewItem)
                     }

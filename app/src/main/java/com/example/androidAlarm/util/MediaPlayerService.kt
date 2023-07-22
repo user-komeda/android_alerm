@@ -26,14 +26,15 @@ class MediaPlayerService : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Timber.d("command")
         val mediaPlayer = MediaPlayer()
-        mediaPlayer!!.setDataSource(
+        mediaPlayer.setDataSource(
             applicationContext,
             RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         )
-        mediaPlayer!!.prepare()
-        mediaPlayer!!.isLooping = true
-        mediaPlayer!!.start()
+        mediaPlayer.prepare()
+        mediaPlayer.isLooping = true
+        mediaPlayer.start()
         val notificationManager: NotificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channel = NotificationChannel(
