@@ -1,10 +1,14 @@
 package com.example.androidAlarm
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.androidAlarm.ui.screens.alarmTime.AlarmTimeScreen
+import com.example.androidAlarm.ui.screens.alarmTime.AlarmTimeViewModel
 import com.example.androidAlarm.ui.screens.calendar.CalendarScreen
 import com.example.androidAlarm.ui.screens.config.ConfigScreen
 import com.example.androidAlarm.ui.screens.config.ConfigViewModel
@@ -17,6 +21,7 @@ import com.example.androidAlarm.ui.screens.detail.DetailViewModel
 import com.example.androidAlarm.ui.screens.home.HomeScreen
 import com.example.androidAlarm.ui.screens.home.HomeViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = AlarmDestination.HOME.name) {
@@ -32,6 +37,9 @@ fun NavHost(navController: NavHostController) {
                 },
                 navigateToDestinationDate = {
                     navController.navigate(AlarmDestination.DESIGNATED_DATE.name)
+                },
+                navigateToAlarmTime = { alarmTime ->
+                    navController.navigate("${AlarmDestination.ALARM_TIME.name}/$alarmTime")
                 }
             )
         }
@@ -61,6 +69,12 @@ fun NavHost(navController: NavHostController) {
         }
         composable(route = AlarmDestination.CALENDAR.name) {
             CalendarScreen()
+        }
+        composable(route = "${AlarmDestination.ALARM_TIME.name}/{alarmTime}") {
+            val alarmTimeViewModel: AlarmTimeViewModel = hiltViewModel<AlarmTimeViewModel>()
+            AlarmTimeScreen(
+                alarmTimeViewModel = alarmTimeViewModel
+            )
         }
     }
 }
