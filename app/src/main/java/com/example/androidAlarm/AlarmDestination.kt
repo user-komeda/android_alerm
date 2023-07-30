@@ -6,7 +6,8 @@ enum class AlarmDestination {
     CONFIG,
     CONFIG_DETAIL,
     DESIGNATED_DATE,
-    CALENDAR;
+    CALENDAR,
+    ALARM_TIME;
 
     companion object {
         fun fromRoute(route: String?): AlarmDestination {
@@ -17,6 +18,7 @@ enum class AlarmDestination {
                 CONFIG_DETAIL.name -> CONFIG_DETAIL
                 DESIGNATED_DATE.name -> DESIGNATED_DATE
                 CALENDAR.name -> CALENDAR
+                ALARM_TIME.name -> ALARM_TIME
                 else -> HOME
             }
         }

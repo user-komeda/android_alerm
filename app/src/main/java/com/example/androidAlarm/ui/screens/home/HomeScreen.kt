@@ -42,6 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidAlarm.model.Alarm
 import com.example.androidAlarm.model.HomeModalItem
 import com.example.androidalerm.R
+import timber.log.Timber
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -49,7 +50,9 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
     navigateToDetail: () -> Unit,
     navigateToConfig: () -> Unit,
-    navigateToDestinationDate: () -> Unit
+    navigateToDestinationDate: () -> Unit,
+    navigateToAlarmTime: (Int) -> Unit
+
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
 
@@ -71,7 +74,11 @@ fun HomeScreen(
             }
         }
         if (uiState.isShowModal) {
-            HomeModalView(homeViewModel = homeViewModel, uiState = uiState)
+            HomeModalView(
+                homeViewModel = homeViewModel,
+                uiState = uiState,
+                navigateToAlarmTime = navigateToAlarmTime
+            )
         }
     }
 }
@@ -140,8 +147,11 @@ private fun HomeListItem(
 @Composable
 private fun HomeModalView(
     homeViewModel: HomeViewModel,
-    uiState: HomeState
+    uiState: HomeState,
+    navigateToAlarmTime: (Int) -> Unit
 ) {
+    Timber.d("anjgwgw,kf")
+
     val context = LocalContext.current
     Dialog(onDismissRequest = { homeViewModel.updateShowModalFlag() }) {
         Surface(
@@ -158,9 +168,13 @@ private fun HomeModalView(
                         Modifier
                             .selectable(
                                 selected = it.alarmTime == uiState.selectedAlarmTime,
-                                onClick = { homeViewModel.selectTime(it.alarmTime, context) }
+                                onClick = {
+                                    homeViewModel.selectTime(it.alarmTime, context)
+                                    navigateToAlarmTime(it.alarmTime)
+                                }
                             )
-                            .fillMaxWidth().size(24.dp)
+                            .fillMaxWidth()
+                            .size(24.dp)
                     ) {
                         Text(text = it.viewItem)
                     }
