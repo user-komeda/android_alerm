@@ -8,5 +8,8 @@ import java.time.LocalTime
 data class AlarmTimeState constructor(
     val alarmTime: LocalTime,
     val elapsedTime: LocalTime,
-    val flag: Boolean = false
+    val isFinishAlarm: Boolean = false,
+    val isEnableSleepMode: Boolean = true,
+    val isOpenDialog: Boolean = false,
+    val isPausing: Boolean = false
 )

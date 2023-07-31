@@ -73,7 +73,10 @@ fun NavHost(navController: NavHostController) {
         composable(route = "${AlarmDestination.ALARM_TIME.name}/{alarmTime}") {
             val alarmTimeViewModel: AlarmTimeViewModel = hiltViewModel<AlarmTimeViewModel>()
             AlarmTimeScreen(
-                alarmTimeViewModel = alarmTimeViewModel
+                alarmTimeViewModel = alarmTimeViewModel,
+                navigateToHomeScreen = {
+                    navController.navigate(AlarmDestination.HOME.name)
+                }
             )
         }
     }
