@@ -9,6 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.androidAlarm.ui.screens.alarmTime.AlarmTimeScreen
 import com.example.androidAlarm.ui.screens.alarmTime.AlarmTimeViewModel
+import com.example.androidAlarm.ui.screens.alarmTimeDetail.AlarmTimeDetailScreen
+import com.example.androidAlarm.ui.screens.alarmTimeDetail.AlarmTimeDetailViewModel
 import com.example.androidAlarm.ui.screens.calendar.CalendarScreen
 import com.example.androidAlarm.ui.screens.config.ConfigScreen
 import com.example.androidAlarm.ui.screens.config.ConfigViewModel
@@ -72,12 +74,23 @@ fun NavHost(navController: NavHostController) {
         }
         composable(route = "${AlarmDestination.ALARM_TIME.name}/{alarmTime}") {
             val alarmTimeViewModel: AlarmTimeViewModel = hiltViewModel<AlarmTimeViewModel>()
+            val alarmTimeDetailViewModel: AlarmTimeDetailViewModel =
+                hiltViewModel<AlarmTimeDetailViewModel>()
             AlarmTimeScreen(
                 alarmTimeViewModel = alarmTimeViewModel,
+                alarmTimeDetailViewModel = alarmTimeDetailViewModel,
                 navigateToHomeScreen = {
                     navController.navigate(AlarmDestination.HOME.name)
+                },
+                navigateToAlarmTimeDetail = {
+                    navController.navigate(AlarmDestination.ALARM_TIME_DETAIL.name)
                 }
             )
+        }
+        composable(route = AlarmDestination.ALARM_TIME_DETAIL.name) {
+            val alarmTimeDetailViewModel: AlarmTimeDetailViewModel =
+                hiltViewModel<AlarmTimeDetailViewModel>()
+            AlarmTimeDetailScreen(alarmTimeDetailViewModel = alarmTimeDetailViewModel)
         }
     }
 }

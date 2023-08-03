@@ -2,6 +2,7 @@
 
 package com.example.androidAlarm.ui.screens.alarmTime
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -116,6 +117,7 @@ constructor(
         }
     }
 
+    @SuppressLint("ScheduleExactAlarm")
     private fun startAlarm(context: Context, selectTime: LocalTime) {
         val calendar: Calendar = Calendar.getInstance()
         calendar.timeInMillis = System.currentTimeMillis()
