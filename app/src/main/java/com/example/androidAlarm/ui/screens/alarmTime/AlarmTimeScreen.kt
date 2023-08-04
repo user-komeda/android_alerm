@@ -42,14 +42,13 @@ fun AlarmTimeScreen(
     alarmTimeViewModel: AlarmTimeViewModel,
     alarmTimeDetailViewModel: AlarmTimeDetailViewModel,
     navigateToHomeScreen: () -> Unit,
-    navigateToAlarmTimeDetail: () -> Unit
 ) {
     val uiState by alarmTimeViewModel.uiState.collectAsState()
     Scaffold(
         topBar = { AppBar() },
         bottomBar = { BottomBar(uiState, alarmTimeViewModel, navigateToHomeScreen) }
     ) {
-        AlarmTIme(uiState, alarmTimeViewModel, alarmTimeDetailViewModel)
+        AlarmTIme(uiState, alarmTimeViewModel, alarmTimeDetailViewModel, navigateToHomeScreen)
         if (uiState.isOpenDialog) {
             ConfirmDialog(
                 alarmTimeViewModel = alarmTimeViewModel,
@@ -126,7 +125,8 @@ fun BottomBar(
 fun AlarmTIme(
     uiState: AlarmTimeState,
     alarmTimeViewModel: AlarmTimeViewModel,
-    alarmTimeDetailViewModel: AlarmTimeDetailViewModel
+    alarmTimeDetailViewModel: AlarmTimeDetailViewModel,
+    navigateToHomeScreen: () -> Unit
 ) {
     if (!uiState.isPausing && !uiState.isFinishAlarm) {
         LaunchedEffect(uiState.alarmTime) {
@@ -138,7 +138,7 @@ fun AlarmTIme(
     }
     if (uiState.isFinishAlarm) {
 //        TODO　ここは画面遷移したい(現状遷移するとアラーム音が消える)
-        AlarmTimeDetailScreen(alarmTimeDetailViewModel)
+        AlarmTimeDetailScreen(alarmTimeDetailViewModel, navigateToHomeScreen)
     } else {
         AlarmPart(uiState = uiState)
     }

@@ -1,5 +1,8 @@
+@file:Suppress("LongMethod", "TooManyFunctions")
+
 package com.example.androidAlarm
 
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -7,6 +10,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navDeepLink
 import com.example.androidAlarm.ui.screens.alarmTime.AlarmTimeScreen
 import com.example.androidAlarm.ui.screens.alarmTime.AlarmTimeViewModel
 import com.example.androidAlarm.ui.screens.alarmTimeDetail.AlarmTimeDetailScreen
@@ -45,7 +49,15 @@ fun NavHost(navController: NavHostController) {
                 }
             )
         }
-        composable(route = AlarmDestination.HOME_DETAIL.name) {
+        composable(
+            route = AlarmDestination.HOME_DETAIL.name,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "myapp://arbitrary_top_level"
+                    action = Intent.ACTION_VIEW
+                }
+            ),
+        ) {
             val detailViewModel: DetailViewModel = hiltViewModel<DetailViewModel>()
             DetailScreen(detailViewModel = detailViewModel)
         }
@@ -82,15 +94,17 @@ fun NavHost(navController: NavHostController) {
                 navigateToHomeScreen = {
                     navController.navigate(AlarmDestination.HOME.name)
                 },
-                navigateToAlarmTimeDetail = {
-                    navController.navigate(AlarmDestination.ALARM_TIME_DETAIL.name)
-                }
             )
         }
         composable(route = AlarmDestination.ALARM_TIME_DETAIL.name) {
             val alarmTimeDetailViewModel: AlarmTimeDetailViewModel =
                 hiltViewModel<AlarmTimeDetailViewModel>()
-            AlarmTimeDetailScreen(alarmTimeDetailViewModel = alarmTimeDetailViewModel)
+            AlarmTimeDetailScreen(
+                alarmTimeDetailViewModel = alarmTimeDetailViewModel,
+                navigateToHomeScreen = {
+                    navController.navigate(AlarmDestination.HOME.name)
+                }
+            )
         }
     }
 }

@@ -1,3 +1,5 @@
+@file:Suppress("LongMethod", "UnnecessaryParenthesesBeforeTrailingLambda", "MagicNumber")
+
 package com.example.androidAlarm.ui.screens.alarmTimeDetail
 
 import android.annotation.SuppressLint
@@ -20,16 +22,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun AlarmTimeDetailScreen(
-    alarmTimeDetailViewModel: AlarmTimeDetailViewModel
+    alarmTimeDetailViewModel: AlarmTimeDetailViewModel,
+    navigateToHomeScreen: () -> Unit
 ) {
     val uiState by alarmTimeDetailViewModel.uiState.collectAsState()
     Scaffold {
-        AlarmTimeDetail(uiState, alarmTimeDetailViewModel)
+        AlarmTimeDetail(uiState, alarmTimeDetailViewModel, navigateToHomeScreen)
     }
 }
 
@@ -37,12 +42,18 @@ fun AlarmTimeDetailScreen(
 @Composable
 private fun AlarmTimeDetail(
     uiState: AlarmTimeDetailState,
-    alarmTimeDetailViewModel: AlarmTimeDetailViewModel
+    alarmTimeDetailViewModel: AlarmTimeDetailViewModel,
+    navigateToHomeScreen: () -> Unit
 ) {
     val context: Context = LocalContext.current
-    alarmTimeDetailViewModel.updateTime()
-    LaunchedEffect(uiState.nowDate) {
+    val nowTime = uiState.nowTime
+    val nowDate = uiState.nowDate
+    val dayOfWeek = uiState.dayOfWeek
+//    alarmTimeDetailViewModel.updateTime()
+    LaunchedEffect(uiState.dayOfWeek) {
         while (true) {
+            alarmTimeDetailViewModel.updateTime()
+            alarmTimeDetailViewModel.updateDate()
             delay(1000 * 60)
         }
     }
@@ -55,19 +66,31 @@ private fun AlarmTimeDetail(
             Text(text = "タイマー1", fontSize = 32.sp)
         }
         Row {
-            Text(text = "2023/08/02 水")
+            Text(text = nowDate.format(DateTimeFormatter.ofPattern("yyyy/MM/dd")) + uiState.dayOfWeek)
         }
         Row {
-            Text(text = "13:28", fontSize = 32.sp)
+            Text(
+                text = nowTime.format(DateTimeFormatter.ofPattern("hh:mm")),
+                fontSize = 32.sp
+            )
         }
         Row {
             Column {
-                TextButton(onClick = { /*TODO*/ }) {
+                TextButton(onClick = {
+                    alarmTimeDetailViewModel.snoozeAlarm(
+                        context,
+                        LocalTime.of(0, 0, 10)
+                    )
+                    navigateToHomeScreen()
+                }) {
                     Text(text = "スヌーズ")
                 }
             }
             Column {
-                TextButton(onClick = { alarmTimeDetailViewModel.stopAlarm(context = context) }) {
+                TextButton(onClick = {
+                    alarmTimeDetailViewModel.stopAlarm(context = context)
+                    navigateToHomeScreen()
+                }) {
                     Text(text = "ストップ")
                 }
             }

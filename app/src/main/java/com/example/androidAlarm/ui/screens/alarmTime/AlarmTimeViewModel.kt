@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.androidAlarm.util.AlarmBroadcastReceiver
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -23,6 +24,7 @@ import java.util.Calendar
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
+@HiltViewModel
 class AlarmTimeViewModel @Inject
 constructor(
     handle: SavedStateHandle,
