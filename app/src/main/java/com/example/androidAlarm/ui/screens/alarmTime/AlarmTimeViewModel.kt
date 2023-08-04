@@ -2,6 +2,7 @@
 
 package com.example.androidAlarm.ui.screens.alarmTime
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -14,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.androidAlarm.util.AlarmBroadcastReceiver
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,6 +24,7 @@ import java.util.Calendar
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
+@HiltViewModel
 class AlarmTimeViewModel @Inject
 constructor(
     handle: SavedStateHandle,
@@ -116,6 +119,7 @@ constructor(
         }
     }
 
+    @SuppressLint("ScheduleExactAlarm")
     private fun startAlarm(context: Context, selectTime: LocalTime) {
         val calendar: Calendar = Calendar.getInstance()
         calendar.timeInMillis = System.currentTimeMillis()

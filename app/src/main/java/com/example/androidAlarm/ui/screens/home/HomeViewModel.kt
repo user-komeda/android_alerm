@@ -1,5 +1,6 @@
 package com.example.androidAlarm.ui.screens.home
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -48,6 +49,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         setAlarm(selectTime, context)
     }
 
+    @SuppressLint("ScheduleExactAlarm")
     private fun setAlarm(selectTime: Int, context: Context) {
         Timber.d("aaaaaaaaaaaaa")
         val calendar: Calendar = Calendar.getInstance()

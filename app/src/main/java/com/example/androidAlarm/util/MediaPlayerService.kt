@@ -12,29 +12,30 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
+import com.example.androidAlarm.model.ServiceState
 import timber.log.Timber
 
-class MediaPlayerService : Service() {
+class MediaPlayerService(
+    private val mediaPlayer: MediaPlayer = MediaPlayer()
+) : Service() {
     override fun onCreate() {
         super.onCreate()
         Timber.d("create")
     }
 
     override fun onBind(p0: Intent?): IBinder? {
-        TODO("Not yet implemented")
+        Timber.d("bind")
+        return TODO("Provide the return value")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.d("destroy")
+        mediaPlayer.stop()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Timber.d("command")
-        val mediaPlayer = MediaPlayer()
-        mediaPlayer.setDataSource(
-            applicationContext,
-            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-        )
-        mediaPlayer.prepare()
-        mediaPlayer.isLooping = true
-        mediaPlayer.start()
         val notificationManager: NotificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channel = NotificationChannel(
@@ -53,6 +54,30 @@ class MediaPlayerService : Service() {
 
         // startForeground
         startForeground(1, notification)
+
+        Timber.d("command")
+
+        if (intent!!.getStringExtra("serviceState").equals(ServiceState.SNOOZE.name)) {
+            mediaPlayer.stop()
+            return START_NOT_STICKY
+        }
+        mediaPlayer.setDataSource(
+            applicationContext,
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        )
+        mediaPlayer.prepare()
+        mediaPlayer.isLooping = true
+        mediaPlayer.start()
+
+//        startActivity(
+//            Intent(
+//                Intent.ACTION_VIEW,
+//                "myapp://arbitrary_top_level".toUri(),
+//                this,
+//                MainActivity::class.java// <-- Notice this
+//
+//            ).setFlags(FLAG_ACTIVITY_NEW_TASK)
+//        )
 
         return START_NOT_STICKY
     }
