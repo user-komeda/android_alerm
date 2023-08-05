@@ -48,8 +48,6 @@ private fun AlarmTimeDetail(
     val context: Context = LocalContext.current
     val nowTime = uiState.nowTime
     val nowDate = uiState.nowDate
-    val dayOfWeek = uiState.dayOfWeek
-//    alarmTimeDetailViewModel.updateTime()
     LaunchedEffect(uiState.dayOfWeek) {
         while (true) {
             alarmTimeDetailViewModel.updateTime()

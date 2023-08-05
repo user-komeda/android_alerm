@@ -50,13 +50,7 @@ fun NavHost(navController: NavHostController) {
             )
         }
         composable(
-            route = AlarmDestination.HOME_DETAIL.name,
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = "myapp://arbitrary_top_level"
-                    action = Intent.ACTION_VIEW
-                }
-            ),
+            route = AlarmDestination.HOME_DETAIL.name
         ) {
             val detailViewModel: DetailViewModel = hiltViewModel<DetailViewModel>()
             DetailScreen(detailViewModel = detailViewModel)
@@ -86,17 +80,22 @@ fun NavHost(navController: NavHostController) {
         }
         composable(route = "${AlarmDestination.ALARM_TIME.name}/{alarmTime}") {
             val alarmTimeViewModel: AlarmTimeViewModel = hiltViewModel<AlarmTimeViewModel>()
-            val alarmTimeDetailViewModel: AlarmTimeDetailViewModel =
-                hiltViewModel<AlarmTimeDetailViewModel>()
             AlarmTimeScreen(
                 alarmTimeViewModel = alarmTimeViewModel,
-                alarmTimeDetailViewModel = alarmTimeDetailViewModel,
                 navigateToHomeScreen = {
                     navController.navigate(AlarmDestination.HOME.name)
                 },
             )
         }
-        composable(route = AlarmDestination.ALARM_TIME_DETAIL.name) {
+        composable(
+            route = AlarmDestination.ALARM_TIME_DETAIL.name,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "myapp://alarmTimeDetail"
+                    action = Intent.ACTION_VIEW
+                }
+            ),
+        ) {
             val alarmTimeDetailViewModel: AlarmTimeDetailViewModel =
                 hiltViewModel<AlarmTimeDetailViewModel>()
             AlarmTimeDetailScreen(

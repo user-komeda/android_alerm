@@ -7,11 +7,14 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
+import com.example.androidAlarm.MainActivity
 import com.example.androidAlarm.model.ServiceState
 import timber.log.Timber
 
@@ -69,15 +72,15 @@ class MediaPlayerService(
         mediaPlayer.isLooping = true
         mediaPlayer.start()
 
-//        startActivity(
-//            Intent(
-//                Intent.ACTION_VIEW,
-//                "myapp://arbitrary_top_level".toUri(),
-//                this,
-//                MainActivity::class.java// <-- Notice this
-//
-//            ).setFlags(FLAG_ACTIVITY_NEW_TASK)
-//        )
+        startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                "myapp://alarmTimeDetail".toUri(),
+                this,
+                MainActivity::class.java // <-- Notice this
+
+            ).setFlags(FLAG_ACTIVITY_NEW_TASK)
+        )
 
         return START_NOT_STICKY
     }

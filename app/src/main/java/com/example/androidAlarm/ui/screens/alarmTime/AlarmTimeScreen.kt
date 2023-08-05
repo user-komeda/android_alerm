@@ -31,8 +31,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.androidAlarm.ui.screens.alarmTimeDetail.AlarmTimeDetailScreen
-import com.example.androidAlarm.ui.screens.alarmTimeDetail.AlarmTimeDetailViewModel
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -40,7 +38,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun AlarmTimeScreen(
     alarmTimeViewModel: AlarmTimeViewModel,
-    alarmTimeDetailViewModel: AlarmTimeDetailViewModel,
     navigateToHomeScreen: () -> Unit,
 ) {
     val uiState by alarmTimeViewModel.uiState.collectAsState()
@@ -48,7 +45,7 @@ fun AlarmTimeScreen(
         topBar = { AppBar() },
         bottomBar = { BottomBar(uiState, alarmTimeViewModel, navigateToHomeScreen) }
     ) {
-        AlarmTIme(uiState, alarmTimeViewModel, alarmTimeDetailViewModel, navigateToHomeScreen)
+        AlarmTIme(uiState, alarmTimeViewModel)
         if (uiState.isOpenDialog) {
             ConfirmDialog(
                 alarmTimeViewModel = alarmTimeViewModel,
@@ -124,9 +121,7 @@ fun BottomBar(
 @Composable
 fun AlarmTIme(
     uiState: AlarmTimeState,
-    alarmTimeViewModel: AlarmTimeViewModel,
-    alarmTimeDetailViewModel: AlarmTimeDetailViewModel,
-    navigateToHomeScreen: () -> Unit
+    alarmTimeViewModel: AlarmTimeViewModel
 ) {
     if (!uiState.isPausing && !uiState.isFinishAlarm) {
         LaunchedEffect(uiState.alarmTime) {
@@ -136,12 +131,7 @@ fun AlarmTIme(
             }
         }
     }
-    if (uiState.isFinishAlarm) {
-//        TODO　ここは画面遷移したい(現状遷移するとアラーム音が消える)
-        AlarmTimeDetailScreen(alarmTimeDetailViewModel, navigateToHomeScreen)
-    } else {
-        AlarmPart(uiState = uiState)
-    }
+    AlarmPart(uiState = uiState)
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
