@@ -2,6 +2,7 @@ package com.example.androidAlarm.ui.screens.designatedDate
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.androidAlarm.domain.usecase.GetDesignatedDaysUseCase
 import com.example.androidAlarm.domain.usecase.GetNationalHolidayUseCase
 import com.example.androidAlarm.model.DesignatedDateGroup
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DesignatedDateViewModel @Inject constructor(
-    val getNationalHolidayUseCase: GetNationalHolidayUseCase
+    private val getNationalHolidayUseCase: GetNationalHolidayUseCase,
+    private val getDesignatedDaysUseCase: GetDesignatedDaysUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DesignatedDateState())
     val uiState = _uiState.asStateFlow()
@@ -28,6 +30,7 @@ class DesignatedDateViewModel @Inject constructor(
 
     fun getData() {
         getDataJob()
+        getDataJob2()
     }
 
     private fun getDataJob() = viewModelScope.launch {
@@ -39,5 +42,16 @@ class DesignatedDateViewModel @Inject constructor(
                 designatedDateMap = copyMap
             )
         }
+    }
+
+    private fun getDataJob2() = viewModelScope.launch {
+        val result: Map<String, String> = getDesignatedDaysUseCase.invoke(1)
+//        val copyMap = _uiState.value.designatedDateMap.toMutableMap()
+//        copyMap[DesignatedDateGroup.ONE_DESIGNATED_DATE] = result
+//        _uiState.update {
+//            it.copy(
+//                designatedDateMap = copyMap
+//            )
+//        }
     }
 }

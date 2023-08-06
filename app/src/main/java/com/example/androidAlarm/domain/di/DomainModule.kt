@@ -1,7 +1,9 @@
 package com.example.androidAlarm.domain.di
 
+import com.example.androidAlarm.data.repository.DesignatedDaysRepository
 import com.example.androidAlarm.data.repository.NationalHolidayRepository
 import com.example.androidAlarm.domain.usecase.BaseUseCase
+import com.example.androidAlarm.domain.usecase.GetDesignatedDaysUseCase
 import com.example.androidAlarm.domain.usecase.GetNationalHolidayUseCase
 import dagger.Module
 import dagger.Provides
@@ -18,5 +20,13 @@ object DomainModule {
         nationalHolidayRepository: NationalHolidayRepository
     ): BaseUseCase<Long, Map<String, String>> {
         return GetNationalHolidayUseCase(nationalHolidayRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetDesignatedDaysUseCase(
+        designatedDaysRepository: DesignatedDaysRepository
+    ): BaseUseCase<Long, Map<String, String>> {
+        return GetDesignatedDaysUseCase(designatedDaysRepository)
     }
 }
