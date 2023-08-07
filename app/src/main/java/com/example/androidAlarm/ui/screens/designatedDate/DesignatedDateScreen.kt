@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.androidAlarm.data.model.NationalHoliday
 import com.example.androidAlarm.model.DesignatedDateGroup
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -93,16 +94,16 @@ fun BottomBar(navigateToCalendar: () -> Unit, designatedDateViewModel: Designate
 
 @Composable
 fun DesignatedDateList(
-    item: String,
-    itemMap: Map<String, String>
+    designatedDate: String,
+    designatedDateName: String
 ) {
     Row(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
     ) {
-        Text(text = item)
-        itemMap[item]?.let { Text(text = it) }
+        Text(text = designatedDate)
+        Text(text = designatedDateName)
     }
 }
 
@@ -110,7 +111,7 @@ fun DesignatedDateList(
 fun TabLayout(
     selectTabIndex: Int,
     designatedDateViewModel: DesignatedDateViewModel,
-    designatedDateMap: Map<DesignatedDateGroup, Map<String, String>>
+    designatedDateMap: Map<DesignatedDateGroup, List<NationalHoliday>>
 ) {
     val keyList: List<DesignatedDateGroup> = DesignatedDateState().designatedDateMap.keys.toList()
     Column(
@@ -129,8 +130,8 @@ fun TabLayout(
             }
         }
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(designatedDateMap[keyList[selectTabIndex]]!!.keys.toList()) {
-                DesignatedDateList(it, designatedDateMap[keyList[selectTabIndex]]!!)
+            items(designatedDateMap[keyList[selectTabIndex]]!!) {
+                DesignatedDateList(it.date, it.holidayName)
                 Divider()
             }
         }
