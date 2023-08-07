@@ -3,6 +3,7 @@ package com.example.androidAlarm.data.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.androidAlarm.data.model.NationalHoliday
 import com.example.androidAlarm.model.DesignatedDateGroup
 import javax.annotation.concurrent.Immutable
 
@@ -17,4 +18,8 @@ data class DesignatedDaysEntity(
     @ColumnInfo(name = "designatedDateName") val designatedDateName: String,
     @ColumnInfo(name = "designatedDateGroup") val designatedDateGroup: DesignatedDateGroup
 
-)
+) {
+    fun convertToNationalHoliday(): NationalHoliday {
+        return NationalHoliday(designatedDate, designatedDateName)
+    }
+}

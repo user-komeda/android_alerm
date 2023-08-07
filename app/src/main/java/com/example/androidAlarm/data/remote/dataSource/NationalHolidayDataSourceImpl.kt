@@ -1,4 +1,6 @@
 package com.example.androidAlarm.data.remote.dataSource
+
+import com.example.androidAlarm.data.model.NationalHoliday
 import com.squareup.moshi.Moshi
 import okhttp3.Call
 import retrofit2.Response
@@ -9,8 +11,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 private interface NationalHolidayApi {
-    @GET(value = "api/v1/date.json")
-    suspend fun getNationalHoliday(): Response<Map<String, String>>
+    @GET(value = "2020")
+    suspend fun getNationalHoliday(): Response<List<NationalHoliday>>
 }
 
 class NationalHolidayDataSourceImpl @Inject constructor(
@@ -18,12 +20,12 @@ class NationalHolidayDataSourceImpl @Inject constructor(
     okhttpCallFactory: Call.Factory,
 ) : NationalHolidayDataSource {
     private val networkApi =
-        Retrofit.Builder().baseUrl("https://holidays-jp.github.io/").callFactory(okhttpCallFactory)
+        Retrofit.Builder().baseUrl("https://api.national-holidays.jp/").callFactory(okhttpCallFactory)
             .addConverterFactory(
                 MoshiConverterFactory.create(moshi)
             ).build().create(NationalHolidayApi::class.java)
 
-    override suspend fun getNationalHoliday(): Response<Map<String, String>> {
+    override suspend fun getNationalHoliday(): Response<List<NationalHoliday>> {
         Timber.d(networkApi.getNationalHoliday().toString())
         return networkApi.getNationalHoliday()
     }
