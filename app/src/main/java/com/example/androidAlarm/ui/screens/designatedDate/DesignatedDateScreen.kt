@@ -1,10 +1,12 @@
 package com.example.androidAlarm.ui.screens.designatedDate
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.androidAlarm.data.model.NationalHoliday
@@ -38,17 +41,21 @@ fun DesignatedDateScreen(
         topBar = { AppBar() },
         bottomBar = { BottomBar(navigateToCalendar, designatedDateViewModel) }
     ) {
-        val uiState = designatedDateViewModel.uiState.collectAsState()
+        val uiState by designatedDateViewModel.uiState.collectAsState()
         TabLayout(
-            selectTabIndex = uiState.value.selectTabIndex,
+            selectTabIndex = uiState.selectTabIndex,
             designatedDateViewModel,
-            uiState.value.designatedDateMap
+            uiState.designatedDateMap
         )
+
+        if (uiState.isShowDesignatedDateModal) {
+            DesignatedDateModal()
+        }
     }
 }
 
 @Composable
-fun AppBar() {
+private fun AppBar() {
     TopAppBar(
         title = {
             Text(text = "指定日の設定")
@@ -57,7 +64,10 @@ fun AppBar() {
 }
 
 @Composable
-fun BottomBar(navigateToCalendar: () -> Unit, designatedDateViewModel: DesignatedDateViewModel) {
+private fun BottomBar(
+    navigateToCalendar: () -> Unit,
+    designatedDateViewModel: DesignatedDateViewModel
+) {
     Column {
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -74,7 +84,10 @@ fun BottomBar(navigateToCalendar: () -> Unit, designatedDateViewModel: Designate
             ) {
                 Text(text = "祝日の取得")
             }
-            TextButton(modifier = Modifier.weight(1f), onClick = { /*TODO*/ }) {
+            TextButton(
+                modifier = Modifier.weight(1f),
+                onClick = { designatedDateViewModel.deleteAllDesignatedDate() }
+            ) {
                 Text(text = "すべて削除")
             }
         }
@@ -93,7 +106,8 @@ fun BottomBar(navigateToCalendar: () -> Unit, designatedDateViewModel: Designate
 }
 
 @Composable
-fun DesignatedDateList(
+private fun DesignatedDateList(
+    designatedDateViewModel: DesignatedDateViewModel,
     designatedDate: String,
     designatedDateName: String
 ) {
@@ -101,6 +115,7 @@ fun DesignatedDateList(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
+            .clickable { designatedDateViewModel.updateShowDesignatedModal(true) }
     ) {
         Text(text = designatedDate)
         Text(text = designatedDateName)
@@ -108,7 +123,7 @@ fun DesignatedDateList(
 }
 
 @Composable
-fun TabLayout(
+private fun TabLayout(
     selectTabIndex: Int,
     designatedDateViewModel: DesignatedDateViewModel,
     designatedDateMap: Map<DesignatedDateGroup, List<NationalHoliday>>
@@ -131,8 +146,28 @@ fun TabLayout(
         }
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(designatedDateMap[keyList[selectTabIndex]]!!) {
-                DesignatedDateList(it.date, it.holidayName)
+                DesignatedDateList(designatedDateViewModel, it.date, it.holidayName)
                 Divider()
+            }
+        }
+    }
+}
+
+@Composable
+private fun DesignatedDateModal() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally, // 横方向
+        verticalArrangement = Arrangement.Center
+    ) {
+        Row {
+            TextButton(onClick = { /*TODO*/ }) {
+                Text(text = "変更")
+            }
+        }
+        Row {
+            TextButton(onClick = { /*TODO*/ }) {
+                Text(text = "削除")
             }
         }
     }
