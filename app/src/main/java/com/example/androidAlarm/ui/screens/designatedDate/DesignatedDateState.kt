@@ -14,5 +14,6 @@ data class DesignatedDateState(
         DesignatedDateGroup.SEVEN_DESIGNATED_DATE to ArrayList<NationalHoliday>(),
     ),
     val selectTabIndex: Int = 0,
-    val isShowDesignatedDateModal: Boolean = false
+    val isShowDesignatedDateModal: Boolean = false,
+    val selectedDate: String = ""
 )

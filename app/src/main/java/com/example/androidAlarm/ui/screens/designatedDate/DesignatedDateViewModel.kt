@@ -58,6 +58,14 @@ class DesignatedDateViewModel @Inject constructor(
         }
     }
 
+    fun updateSelectedDate(selectedDate: String) {
+        _uiState.update {
+            it.copy(
+                selectedDate = selectedDate
+            )
+        }
+    }
+
     private fun getNationalHoliday() = viewModelScope.launch {
         val result: List<NationalHoliday> = getNationalHolidayUseCase.invoke(1)
         val copyMap = _uiState.value.designatedDateMap.toMutableMap()
