@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package com.example.androidAlarm.ui.screens.designatedDate
 
 import androidx.lifecycle.ViewModel
@@ -6,7 +8,6 @@ import com.example.androidAlarm.data.entity.DesignatedDaysEntity
 import com.example.androidAlarm.data.model.NationalHoliday
 import com.example.androidAlarm.domain.usecase.GetDesignatedDaysUseCase
 import com.example.androidAlarm.domain.usecase.GetNationalHolidayUseCase
-import com.example.androidAlarm.model.DesignatedDateGroup
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,9 +41,48 @@ class DesignatedDateViewModel @Inject constructor(
         getNationalHoliday()
     }
 
+    fun updateShowDateTimePicker(flag: Boolean) {
+        _uiState.update {
+            it.copy(
+                isShowDataTimePicker = flag
+            )
+        }
+    }
+
+    fun updateDesignatedDateName(value: String) {
+        _uiState.update {
+            it.copy(
+                designatedDateName = value
+            )
+        }
+    }
+
+//    fun changeDesignatedDate() {
+//    }
+
+    fun deleteDesignatedDate() {
+        val copyMap = _uiState.value.designatedDateMap.toMutableMap()
+        val copyList = copyMap[_uiState.value.designatedDateMapKeyList[0]]!!.toMutableList()
+
+        copyList.filter {
+            it.holidayName == _uiState.value.selectedDate
+        }.forEach {
+            copyList.remove(it)
+        }
+
+        copyMap[_uiState.value.designatedDateMapKeyList[0]] = copyList
+
+        updateShowDesignatedModal(false)
+        _uiState.update {
+            it.copy(
+                designatedDateMap = copyMap
+            )
+        }
+    }
+
     fun deleteAllDesignatedDate() {
         val copyMap = _uiState.value.designatedDateMap.toMutableMap()
-        copyMap[DesignatedDateGroup.ONE_DESIGNATED_DATE] = ArrayList()
+        copyMap[_uiState.value.designatedDateMapKeyList[0]] = ArrayList()
         _uiState.update {
             it.copy(
                 designatedDateMap = copyMap
@@ -69,7 +109,7 @@ class DesignatedDateViewModel @Inject constructor(
     private fun getNationalHoliday() = viewModelScope.launch {
         val result: List<NationalHoliday> = getNationalHolidayUseCase.invoke(1)
         val copyMap = _uiState.value.designatedDateMap.toMutableMap()
-        copyMap[DesignatedDateGroup.getDesignatedGroupFromTabIndex(_uiState.value.selectTabIndex)] =
+        copyMap[_uiState.value.designatedDateMapKeyList[_uiState.value.selectTabIndex]] =
             result
         _uiState.update {
             it.copy(
@@ -85,7 +125,7 @@ class DesignatedDateViewModel @Inject constructor(
             it.convertToNationalHoliday()
         }.toList()
         val copyMap = _uiState.value.designatedDateMap.toMutableMap()
-        copyMap[DesignatedDateGroup.ONE_DESIGNATED_DATE] = nationalHolidayList
+        copyMap[_uiState.value.designatedDateMapKeyList[0]] = nationalHolidayList
         _uiState.update {
             it.copy(
                 designatedDateMap = copyMap

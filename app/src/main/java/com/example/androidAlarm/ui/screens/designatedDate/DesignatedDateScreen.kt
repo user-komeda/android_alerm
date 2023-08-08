@@ -3,6 +3,8 @@
 package com.example.androidAlarm.ui.screens.designatedDate
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +22,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
@@ -27,19 +31,25 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.androidAlarm.data.model.NationalHoliday
-import com.example.androidAlarm.model.DesignatedDateGroup
+import timber.log.Timber
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun DesignatedDateScreen(
@@ -54,11 +64,17 @@ fun DesignatedDateScreen(
         TabLayout(
             selectTabIndex = uiState.selectTabIndex,
             designatedDateViewModel,
-            uiState.designatedDateMap
+            uiState
         )
 
         if (uiState.isShowDesignatedDateModal) {
             DesignatedDateModal(designatedDateViewModel, uiState)
+        }
+        if (uiState.isShowDataTimePicker) {
+            DatePickerDialogSample(
+                designatedDateViewModel = designatedDateViewModel,
+                uiState = uiState
+            )
         }
     }
 }
@@ -138,9 +154,9 @@ private fun DesignatedDateList(
 private fun TabLayout(
     selectTabIndex: Int,
     designatedDateViewModel: DesignatedDateViewModel,
-    designatedDateMap: Map<DesignatedDateGroup, List<NationalHoliday>>
+    uiState: DesignatedDateState
 ) {
-    val keyList: List<DesignatedDateGroup> = DesignatedDateState().designatedDateMap.keys.toList()
+    val keyList: List<String> = uiState.designatedDateMapKeyList
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -149,7 +165,7 @@ private fun TabLayout(
         ScrollableTabRow(selectedTabIndex = selectTabIndex, edgePadding = 0.dp) {
             keyList.forEachIndexed { index, title ->
                 Tab(
-                    text = { Text(text = title.value) },
+                    text = { Text(text = title) },
                     selected = selectTabIndex == index,
                     onClick = { designatedDateViewModel.update(index) },
                     icon = { Icons.Default.Home }
@@ -157,7 +173,7 @@ private fun TabLayout(
             }
         }
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(designatedDateMap[keyList[selectTabIndex]]!!) {
+            items(uiState.designatedDateMap[uiState.designatedDateMapKeyList[selectTabIndex]]!!) {
                 DesignatedDateList(designatedDateViewModel, it.date, it.holidayName)
                 Divider()
             }
@@ -187,29 +203,90 @@ private fun DesignatedDateModal(
                         .padding(start = (LocalConfiguration.current.screenWidthDp / 3).dp)
                         .height(heightSize.dp)
                 ) {
-                    Text(text = uiState.selectedDate, Modifier.padding(top = (heightSize / 3).dp))
+                    Text(
+                        text = uiState.selectedDate,
+                        Modifier.padding(top = (heightSize / 3).dp),
+                    )
                 }
                 Divider()
                 Row(
                     Modifier
                         .height(heightSize.dp)
-                        .clickable { }
+                        .fillMaxWidth()
+                        .clickable { designatedDateViewModel.updateShowDateTimePicker(true) }
                 ) {
-                    TextButton(onClick = { /*TODO*/ }) {
-                        Text(text = "変更", textAlign = TextAlign.Left)
-                    }
+                    Text(text = "変更", textAlign = TextAlign.Left)
                 }
                 Divider()
                 Row(
                     Modifier
                         .height(heightSize.dp)
-                        .clickable { }
+                        .fillMaxWidth()
+                        .clickable { designatedDateViewModel.deleteDesignatedDate() }
                 ) {
-                    TextButton(onClick = { /*TODO*/ }) {
-                        Text(text = "削除", textAlign = TextAlign.Left)
-                    }
+                    Text(text = "削除", textAlign = TextAlign.Left)
                 }
             }
         }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("RememberReturnType", "UnrememberedMutableState")
+@Composable
+fun DatePickerDialogSample(
+    designatedDateViewModel: DesignatedDateViewModel,
+    uiState: DesignatedDateState
+) {
+    val state = rememberDatePickerState(initialSelectedDateMillis = Instant.now().toEpochMilli())
+    val instant = state.selectedDateMillis?.let { Instant.ofEpochMilli(it) }
+    Timber.d(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toString())
+    DatePickerDialog(
+        modifier = Modifier.fillMaxSize(),
+        onDismissRequest = {
+            designatedDateViewModel.updateShowDateTimePicker(false)
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    designatedDateViewModel.updateShowDateTimePicker(false)
+                    Timber.d(state.selectedDateMillis.toString())
+                },
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    designatedDateViewModel.updateShowDateTimePicker(false)
+                }
+            ) {
+                Text("Cancel")
+            }
+        },
+        content = {
+            DesignatedDateField(
+                uiState = uiState,
+                designatedDateViewModel = designatedDateViewModel
+            )
+            DatePicker(state = state, title = null)
+        },
+    )
+}
+
+@Composable
+private fun DesignatedDateField(
+    uiState: DesignatedDateState,
+    designatedDateViewModel: DesignatedDateViewModel
+) {
+    Column(
+        Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        TextField(
+            value = uiState.designatedDateName,
+            onValueChange = { newValue -> designatedDateViewModel.updateDesignatedDateName(newValue) }
+        )
     }
 }
