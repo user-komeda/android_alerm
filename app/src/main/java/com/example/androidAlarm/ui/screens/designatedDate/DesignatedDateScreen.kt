@@ -44,10 +44,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import timber.log.Timber
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -88,6 +89,7 @@ private fun AppBar() {
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun BottomBar(
     navigateToCalendar: () -> Unit,
@@ -130,6 +132,7 @@ private fun BottomBar(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun DesignatedDateList(
     designatedDateViewModel: DesignatedDateViewModel,
@@ -142,7 +145,15 @@ private fun DesignatedDateList(
             .fillMaxWidth()
             .clickable {
                 designatedDateViewModel.updateShowDesignatedModal(true)
-                designatedDateViewModel.updateSelectedDate(designatedDateName)
+                designatedDateViewModel.updateDesignatedDate(
+                    designatedDate = LocalDate
+                        .parse(
+                            designatedDate,
+                            DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                        )
+                        .atStartOfDay()
+                )
+                designatedDateViewModel.updateDesignatedDateName(designatedDateName = designatedDateName)
             }
     ) {
         Text(text = designatedDate)
@@ -150,6 +161,7 @@ private fun DesignatedDateList(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun TabLayout(
     selectTabIndex: Int,
@@ -181,6 +193,7 @@ private fun TabLayout(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun DesignatedDateModal(
     designatedDateViewModel: DesignatedDateViewModel,
@@ -204,7 +217,7 @@ private fun DesignatedDateModal(
                         .height(heightSize.dp)
                 ) {
                     Text(
-                        text = uiState.selectedDate,
+                        text = uiState.designatedDateName,
                         Modifier.padding(top = (heightSize / 3).dp),
                     )
                 }
@@ -240,7 +253,6 @@ fun DatePickerDialogSample(
 ) {
     val state = rememberDatePickerState(initialSelectedDateMillis = Instant.now().toEpochMilli())
     val instant = state.selectedDateMillis?.let { Instant.ofEpochMilli(it) }
-    Timber.d(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toString())
     DatePickerDialog(
         modifier = Modifier.fillMaxSize(),
         onDismissRequest = {
@@ -250,7 +262,13 @@ fun DatePickerDialogSample(
             TextButton(
                 onClick = {
                     designatedDateViewModel.updateShowDateTimePicker(false)
-                    Timber.d(state.selectedDateMillis.toString())
+                    designatedDateViewModel.updateDesignatedObject(
+                        LocalDateTime.ofInstant(
+                            instant,
+                            ZoneId.systemDefault()
+                        ),
+                        uiState.designatedDateName
+                    )
                 },
             ) {
                 Text("OK")
@@ -275,18 +293,22 @@ fun DatePickerDialogSample(
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun DesignatedDateField(
     uiState: DesignatedDateState,
     designatedDateViewModel: DesignatedDateViewModel
 ) {
     Column(
-        Modifier.fillMaxWidth(),
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TextField(
             value = uiState.designatedDateName,
-            onValueChange = { newValue -> designatedDateViewModel.updateDesignatedDateName(newValue) }
+            onValueChange = { newValue -> designatedDateViewModel.updateDesignatedDateName(newValue) },
+            label = { Text(text = "指定日名称") }
         )
     }
 }
