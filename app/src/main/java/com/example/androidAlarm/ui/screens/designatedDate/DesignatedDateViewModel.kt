@@ -98,12 +98,35 @@ class DesignatedDateViewModel @Inject constructor(
         updateDesignatedDateName(designatedDateName = designatedDateName)
 
         copyMap[_uiState.value.designatedDateMapKeyList[_uiState.value.selectTabIndex]] = copyList
-
         _uiState.update {
             it.copy(
                 designatedDateMap = copyMap
             )
         }
+    }
+
+    fun updateShowAddDesignatedDateModal(flag: Boolean) {
+        _uiState.update {
+            it.copy(
+                isShowAddDesignatedDateModal = flag
+            )
+        }
+    }
+
+    fun addDesignatedMap(designatedDate: LocalDateTime, designatedDateName: String) {
+        val copyMap = _uiState.value.designatedDateMap.toMutableMap()
+        val copyList = copyMap[_uiState.value.designatedDateMapKeyList[0]]!!.toMutableList()
+        copyList.add(NationalHoliday(designatedDate.toString(), designatedDateName))
+        copyMap[_uiState.value.designatedDateMapKeyList[_uiState.value.selectTabIndex]] = copyList
+        _uiState.update {
+            it.copy(
+                designatedDateMap = copyMap
+            )
+        }
+    }
+
+    fun addAllDesignatedMap() {
+        TODO()
     }
 
     fun deleteDesignatedDate() {

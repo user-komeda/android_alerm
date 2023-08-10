@@ -33,4 +33,5 @@ data class DesignatedDateState constructor(
     val designatedDate: LocalDateTime = LocalDateTime.now(),
     val designatedDateName: String = "",
     val isShowDataTimePicker: Boolean = false,
+    val isShowAddDesignatedDateModal: Boolean = false
 )

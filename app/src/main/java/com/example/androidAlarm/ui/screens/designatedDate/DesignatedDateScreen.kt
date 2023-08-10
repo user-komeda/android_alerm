@@ -10,40 +10,29 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
+import com.example.androidAlarm.ui.components.AlarmDatePickerDialog
+import com.example.androidAlarm.ui.components.AlarmDialog
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -77,6 +66,10 @@ fun DesignatedDateScreen(
                 uiState = uiState
             )
         }
+
+        if (uiState.isShowAddDesignatedDateModal) {
+            AddDesignatedDateModal(designatedDateViewModel = designatedDateViewModel)
+        }
     }
 }
 
@@ -102,7 +95,10 @@ private fun BottomBar(
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
         ) {
-            TextButton(modifier = Modifier.weight(1f), onClick = { /*TODO*/ }) {
+            TextButton(
+                modifier = Modifier.weight(1f),
+                onClick = { designatedDateViewModel.updateShowAddDesignatedDateModal(true) }
+            ) {
                 Text(text = "追加")
             }
             TextButton(
@@ -199,116 +195,58 @@ private fun DesignatedDateModal(
     designatedDateViewModel: DesignatedDateViewModel,
     uiState: DesignatedDateState
 ) {
-    val heightSize = LocalConfiguration.current.screenHeightDp / 4 / 3
-    Dialog(onDismissRequest = { designatedDateViewModel.updateShowDesignatedModal(false) }) {
-        Surface(
-            modifier = Modifier
-                .width((LocalConfiguration.current.screenWidthDp).dp)
-                .height((LocalConfiguration.current.screenHeightDp / 4).dp)
-                .wrapContentHeight(),
-            shape = RoundedCornerShape(size = 10.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(start = (LocalConfiguration.current.screenWidthDp / 3).dp)
-                        .height(heightSize.dp)
-                ) {
-                    Text(
-                        text = uiState.designatedDateName,
-                        Modifier.padding(top = (heightSize / 3).dp),
-                    )
-                }
-                Divider()
-                Row(
-                    Modifier
-                        .height(heightSize.dp)
-                        .fillMaxWidth()
-                        .clickable { designatedDateViewModel.updateShowDateTimePicker(true) }
-                ) {
-                    Text(text = "変更", textAlign = TextAlign.Left)
-                }
-                Divider()
-                Row(
-                    Modifier
-                        .height(heightSize.dp)
-                        .fillMaxWidth()
-                        .clickable { designatedDateViewModel.deleteDesignatedDate() }
-                ) {
-                    Text(text = "削除", textAlign = TextAlign.Left)
-                }
-            }
-        }
-    }
+    AlarmDialog(
+        title = uiState.designatedDateName,
+        text1 = "変更",
+        text2 = "削除",
+        method1 = { designatedDateViewModel.updateShowDateTimePicker(true) },
+        method2 = { designatedDateViewModel.deleteDesignatedDate() },
+        onDismissRequest = { designatedDateViewModel.updateShowDesignatedModal(false) }
+    )
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("RememberReturnType", "UnrememberedMutableState")
 @Composable
-fun DatePickerDialogSample(
+private fun DatePickerDialogSample(
     designatedDateViewModel: DesignatedDateViewModel,
     uiState: DesignatedDateState
 ) {
     val state = rememberDatePickerState(initialSelectedDateMillis = Instant.now().toEpochMilli())
     val instant = state.selectedDateMillis?.let { Instant.ofEpochMilli(it) }
-    DatePickerDialog(
-        modifier = Modifier.fillMaxSize(),
-        onDismissRequest = {
+
+    AlarmDatePickerDialog(
+        onDismissRequest = { designatedDateViewModel.updateShowDateTimePicker(false) },
+        onClickConfirmButton = {
             designatedDateViewModel.updateShowDateTimePicker(false)
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    designatedDateViewModel.updateShowDateTimePicker(false)
-                    designatedDateViewModel.updateDesignatedObject(
-                        LocalDateTime.ofInstant(
-                            instant,
-                            ZoneId.systemDefault()
-                        ),
-                        uiState.designatedDateName
-                    )
-                },
-            ) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    designatedDateViewModel.updateShowDateTimePicker(false)
-                }
-            ) {
-                Text("Cancel")
-            }
-        },
-        content = {
-            DesignatedDateField(
-                uiState = uiState,
-                designatedDateViewModel = designatedDateViewModel
+            designatedDateViewModel.updateDesignatedObject(
+                LocalDateTime.ofInstant(
+                    instant,
+                    ZoneId.systemDefault()
+                ),
+                uiState.designatedDateName
             )
-            DatePicker(state = state, title = null)
         },
+        onCClickDismissButton = { designatedDateViewModel.updateShowDateTimePicker(false) },
+        textFieldValue = uiState.designatedDateName,
+        onValueChange = { newValue -> designatedDateViewModel.updateDesignatedDateName(newValue) },
+        state = state
     )
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun DesignatedDateField(
-    uiState: DesignatedDateState,
+private fun AddDesignatedDateModal(
     designatedDateViewModel: DesignatedDateViewModel
 ) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        TextField(
-            value = uiState.designatedDateName,
-            onValueChange = { newValue -> designatedDateViewModel.updateDesignatedDateName(newValue) },
-            label = { Text(text = "指定日名称") }
-        )
-    }
+    AlarmDialog(
+        title = "指定日の追加",
+        text1 = "1日追加",
+        text2 = "開始・終了日追加",
+        method1 = {
+            designatedDateViewModel.updateShowDateTimePicker(true)
+        },
+        method2 = { designatedDateViewModel.updateShowDateTimePicker(true) },
+        onDismissRequest = { designatedDateViewModel.updateShowAddDesignatedDateModal(false) }
+    )
 }
