@@ -4,6 +4,7 @@ package com.example.androidAlarm.ui.screens.designatedDate
 
 import android.annotation.SuppressLint
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -30,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.androidAlarm.ui.components.AlarmDatePickerDialog
 import com.example.androidAlarm.ui.components.AlarmDialog
@@ -66,9 +68,20 @@ fun DesignatedDateScreen(
                 uiState = uiState
             )
         }
-
         if (uiState.isShowAddDesignatedDateModal) {
             AddDesignatedDateModal(designatedDateViewModel = designatedDateViewModel)
+        }
+        if (uiState.isShowDataTimePicker2) {
+            DatePickerDialogSample2(
+                designatedDateViewModel = designatedDateViewModel,
+                uiState = uiState
+            )
+        }
+        if (uiState.isShowDataTimePicker3) {
+            DatePickerDialogSample3(
+                designatedDateViewModel = designatedDateViewModel,
+                uiState = uiState
+            )
         }
     }
 }
@@ -235,6 +248,66 @@ private fun DatePickerDialogSample(
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("RememberReturnType", "UnrememberedMutableState")
+@Composable
+private fun DatePickerDialogSample2(
+    designatedDateViewModel: DesignatedDateViewModel,
+    uiState: DesignatedDateState
+) {
+    val state = rememberDatePickerState(initialSelectedDateMillis = Instant.now().toEpochMilli())
+    val instant = state.selectedDateMillis?.let { Instant.ofEpochMilli(it) }
+
+    AlarmDatePickerDialog(
+        onDismissRequest = { designatedDateViewModel.updateShowDateTimePicker(false) },
+        onClickConfirmButton = {
+            designatedDateViewModel.updateShowDateTimePicker2(false)
+            designatedDateViewModel.addDesignatedMap(
+                LocalDateTime.ofInstant(
+                    instant,
+                    ZoneId.systemDefault()
+                ),
+                uiState.designatedDateName
+            )
+        },
+        onCClickDismissButton = { designatedDateViewModel.updateShowDateTimePicker2(false) },
+        textFieldValue = uiState.designatedDateName,
+        onValueChange = { newValue -> designatedDateViewModel.updateDesignatedDateName(newValue) },
+        state = state
+    )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("RememberReturnType", "UnrememberedMutableState")
+@Composable
+private fun DatePickerDialogSample3(
+    designatedDateViewModel: DesignatedDateViewModel,
+    uiState: DesignatedDateState
+) {
+    val state = rememberDatePickerState(initialSelectedDateMillis = Instant.now().toEpochMilli())
+    val instant = state.selectedDateMillis?.let { Instant.ofEpochMilli(it) }
+    val context = LocalContext.current
+    AlarmDatePickerDialog(
+        onDismissRequest = { designatedDateViewModel.updateShowDateTimePicker(false) },
+        onClickConfirmButton = {
+            Toast.makeText(context, "指定日が指定されました", Toast.LENGTH_SHORT).show()
+            designatedDateViewModel.updateShowDateTimePicker3(false)
+            designatedDateViewModel.addAllDesignatedMap(
+                LocalDateTime.ofInstant(
+                    instant,
+                    ZoneId.systemDefault()
+                ),
+
+                uiState.designatedDateName
+            )
+        },
+        onCClickDismissButton = { designatedDateViewModel.updateShowDateTimePicker3(false) },
+        textFieldValue = uiState.designatedDateName,
+        onValueChange = { newValue -> designatedDateViewModel.updateDesignatedDateName(newValue) },
+        state = state
+    )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun AddDesignatedDateModal(
     designatedDateViewModel: DesignatedDateViewModel
@@ -244,9 +317,9 @@ private fun AddDesignatedDateModal(
         text1 = "1日追加",
         text2 = "開始・終了日追加",
         method1 = {
-            designatedDateViewModel.updateShowDateTimePicker(true)
+            designatedDateViewModel.updateShowDateTimePicker2(true)
         },
-        method2 = { designatedDateViewModel.updateShowDateTimePicker(true) },
+        method2 = { designatedDateViewModel.updateShowDateTimePicker3(true) },
         onDismissRequest = { designatedDateViewModel.updateShowAddDesignatedDateModal(false) }
     )
 }
