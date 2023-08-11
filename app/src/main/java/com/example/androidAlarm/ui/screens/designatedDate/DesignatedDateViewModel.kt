@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.util.copy
 import com.example.androidAlarm.data.entity.DesignatedDaysEntity
 import com.example.androidAlarm.data.model.NationalHoliday
 import com.example.androidAlarm.domain.usecase.GetDesignatedDaysUseCase
@@ -19,6 +20,7 @@ import timber.log.Timber
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlin.streams.toList
 
@@ -51,6 +53,30 @@ class DesignatedDateViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isShowDataTimePicker = flag
+            )
+        }
+    }
+
+    fun updateShowDateTimePicker2(flag: Boolean) {
+        _uiState.update {
+            it.copy(
+                isShowDataTimePicker2 = flag
+            )
+        }
+    }
+
+    fun updateShowDateTimePicker3(flag: Boolean) {
+        _uiState.update {
+            it.copy(
+                isShowDataTimePicker3 = flag
+            )
+        }
+    }
+
+    fun updateShowComplete(flag: Boolean) {
+        _uiState.update {
+            it.copy(
+                isComplete = flag
             )
         }
     }
@@ -115,8 +141,14 @@ class DesignatedDateViewModel @Inject constructor(
 
     fun addDesignatedMap(designatedDate: LocalDateTime, designatedDateName: String) {
         val copyMap = _uiState.value.designatedDateMap.toMutableMap()
-        val copyList = copyMap[_uiState.value.designatedDateMapKeyList[0]]!!.toMutableList()
-        copyList.add(NationalHoliday(designatedDate.toString(), designatedDateName))
+        val copyList =
+            copyMap[_uiState.value.designatedDateMapKeyList[_uiState.value.selectTabIndex]]!!.toMutableList()
+        copyList.add(
+            NationalHoliday(
+                designatedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                designatedDateName
+            )
+        )
         copyMap[_uiState.value.designatedDateMapKeyList[_uiState.value.selectTabIndex]] = copyList
         _uiState.update {
             it.copy(
@@ -125,8 +157,45 @@ class DesignatedDateViewModel @Inject constructor(
         }
     }
 
-    fun addAllDesignatedMap() {
-        TODO()
+    fun addAllDesignatedMap(designatedDate: LocalDateTime, designatedDateName: String) {
+        if (!_uiState.value.isComplete) {
+            updateDesignatedDate(designatedDate = designatedDate)
+            updateDesignatedDateName(designatedDateName = designatedDateName)
+            _uiState.update {
+                it.copy(
+                    isComplete = true,
+                    isShowDataTimePicker3 = true
+
+                )
+            }
+            return
+        }
+
+        val daysDiff: Long = ChronoUnit.DAYS.between(_uiState.value.designatedDate, designatedDate)
+        val copyMap = _uiState.value.designatedDateMap.toMutableMap()
+        val copyList =
+            copyMap[_uiState.value.designatedDateMapKeyList[_uiState.value.selectTabIndex]]!!.toMutableList()
+        Timber.d(daysDiff.toString())
+        for (i in 0..daysDiff) {
+            copyList.add(
+                NationalHoliday(
+                    _uiState.value.designatedDate.plusDays(i)
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                    designatedDateName
+                )
+            )
+        }
+
+        copyMap[_uiState.value.designatedDateMapKeyList[_uiState.value.selectTabIndex]] =
+            copyList.distinctBy {
+                it.date
+            }
+        _uiState.update {
+            it.copy(
+                designatedDateMap = copyMap,
+                isComplete = false
+            )
+        }
     }
 
     fun deleteDesignatedDate() {
