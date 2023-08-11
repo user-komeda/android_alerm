@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.androidAlarm.ui.components.AlarmAlertDialog
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -199,33 +199,17 @@ private fun ConfirmDialog(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = {
-                Text(text = "クイックタイマーの削除")
-            },
-            text = {
-                Text(
-                    "クイックタイマーを削除します"
+        AlarmAlertDialog(
+            alertTitle = "クイックタイマーの削除",
+            alertText = "クリックタイマーを削除します",
+            clickConfirmButton = {
+                alarmTimeViewModel.clearAlarm(
+                    context = context,
+                    navigateToHomeScreen = { navigateToHomeScreen() }
                 )
             },
-            confirmButton = {
-                TextButton(
-                    onClick = { // confirmをタップしたとき
-                        alarmTimeViewModel.clearAlarm(context = context) { navigateToHomeScreen() }
-                    }
-                ) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { // confirmをタップしたとき
-                        alarmTimeViewModel.updateOpenDialogFlag(false)
-                    }
-                ) {
-                    Text("キャンセル")
-                }
+            clickDismissButton = {
+                alarmTimeViewModel.updateOpenDialogFlag(false)
             }
         )
     }
