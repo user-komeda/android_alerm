@@ -1,4 +1,4 @@
-@file:Suppress("MagicNumber")
+@file:Suppress("MagicNumber", "TooManyFunctions")
 
 package com.example.androidAlarm.ui.screens.designatedDate
 
@@ -13,17 +13,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -33,6 +38,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.androidAlarm.ui.components.AlarmDatePickerDialog
 import com.example.androidAlarm.ui.components.AlarmDialog
 import java.time.Instant
@@ -79,6 +86,18 @@ fun DesignatedDateScreen(
         }
         if (uiState.isShowDataTimePicker3) {
             DatePickerDialogSample3(
+                designatedDateViewModel = designatedDateViewModel,
+                uiState = uiState
+            )
+        }
+        if (uiState.isShowDesignatedDateLabelModal) {
+            UpdateDesignatedDateLabelModal(
+                designatedDateViewModel = designatedDateViewModel,
+                uiState = uiState
+            )
+        }
+        if (uiState.isShowEditDesignatedDateLabelModal) {
+            EditDesignatedDateLabelModal(
                 designatedDateViewModel = designatedDateViewModel,
                 uiState = uiState
             )
@@ -134,7 +153,10 @@ private fun BottomBar(
             TextButton(modifier = Modifier.weight(1f), onClick = navigateToCalendar) {
                 Text(text = "カレンダーから選択")
             }
-            TextButton(modifier = Modifier.weight(1f), onClick = { /*TODO*/ }) {
+            TextButton(
+                modifier = Modifier.weight(1f),
+                onClick = { designatedDateViewModel.updateShowDesignatedDateLabelModal(true) }
+            ) {
                 Text(text = "指定日のラベル変更")
             }
         }
@@ -322,4 +344,92 @@ private fun AddDesignatedDateModal(
         method2 = { designatedDateViewModel.updateShowDateTimePicker3(true) },
         onDismissRequest = { designatedDateViewModel.updateShowAddDesignatedDateModal(false) }
     )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+private fun UpdateDesignatedDateLabelModal(
+    designatedDateViewModel: DesignatedDateViewModel,
+    uiState: DesignatedDateState
+) {
+    Dialog(onDismissRequest = { designatedDateViewModel.updateShowDesignatedDateLabelModal(false) }) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(size = 10.dp)
+        ) {
+            LazyColumn(
+                Modifier.fillMaxWidth()
+            ) {
+                items(uiState.designatedDateMapKeyList) {
+                    Row(
+                        Modifier
+                            .clickable {
+                                designatedDateViewModel.updateShowDesignatedDateLabelModal(false)
+                                designatedDateViewModel.updateSelectDesignatedDateLabel(it)
+                                designatedDateViewModel.updateShowEditDesignatedDateLabel(true)
+                            }
+                            .fillMaxWidth()
+                            .size(24.dp)
+                    ) {
+                        Text(text = it)
+                    }
+                    Divider()
+                }
+            }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+private fun EditDesignatedDateLabelModal(
+    designatedDateViewModel: DesignatedDateViewModel,
+    uiState: DesignatedDateState
+) {
+    Dialog(onDismissRequest = { designatedDateViewModel.updateShowEditDesignatedDateLabel(false) }) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(size = 10.dp)
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            ) {
+                Row(modifier = Modifier.padding(bottom = 16.dp)) {
+                    Text(text = "指定日のラベル変更", fontSize = 28.sp)
+                }
+                Row {
+                    TextField(
+                        value = uiState.editTextDesignatedDateLabel,
+                        onValueChange = { newValue ->
+                            designatedDateViewModel.updateEditTextDesignatedDateLabel(
+                                newValue
+                            )
+                        }
+                    )
+                }
+                Row(modifier = Modifier.padding(top = 16.dp)) {
+                    TextButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            designatedDateViewModel.updateDesignatedDateLabel(uiState.editTextDesignatedDateLabel)
+                        }
+                    ) {
+                        Text(text = "OK")
+                    }
+                    TextButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = { designatedDateViewModel.updateShowEditDesignatedDateLabel(false) }
+                    ) {
+                        Text(text = "キャンセル")
+                    }
+                }
+            }
+        }
+    }
 }

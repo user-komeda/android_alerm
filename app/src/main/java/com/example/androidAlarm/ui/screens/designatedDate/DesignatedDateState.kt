@@ -36,5 +36,10 @@ data class DesignatedDateState constructor(
     val isShowDataTimePicker2: Boolean = false,
     val isShowDataTimePicker3: Boolean = false,
     val isComplete: Boolean = false,
-    val isShowAddDesignatedDateModal: Boolean = false
+    val isShowAddDesignatedDateModal: Boolean = false,
+    val isShowDesignatedDateLabelModal: Boolean = false,
+    val selectDesignatedDateLabel: String = "",
+    val editTextDesignatedDateLabel: String = "",
+    val isShowEditDesignatedDateLabelModal: Boolean = false,
+    val isOkEditDesignatedDateLabelModal: Boolean = false
 )
