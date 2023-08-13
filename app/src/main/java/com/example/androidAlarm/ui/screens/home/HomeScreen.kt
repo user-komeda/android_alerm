@@ -10,22 +10,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -33,14 +27,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidAlarm.model.Alarm
-import com.example.androidAlarm.model.HomeModalItem
 import com.example.androidalerm.R
 import timber.log.Timber
 
@@ -151,40 +142,4 @@ private fun HomeModalView(
     navigateToAlarmTime: (Int) -> Unit
 ) {
     Timber.d("anjgwgw,kf")
-
-    val context = LocalContext.current
-    Dialog(onDismissRequest = { homeViewModel.updateShowModalFlag() }) {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            shape = RoundedCornerShape(size = 10.dp)
-        ) {
-            LazyColumn(
-                Modifier.fillMaxWidth()
-            ) {
-                items(HomeModalItem.values()) {
-                    Row(
-                        Modifier
-                            .selectable(
-                                selected = it.alarmTime == uiState.selectedAlarmTime,
-                                onClick = {
-                                    homeViewModel.selectTime(it.alarmTime, context)
-                                    navigateToAlarmTime(it.alarmTime)
-                                }
-                            )
-                            .fillMaxWidth()
-                            .size(24.dp)
-                    ) {
-                        Text(text = it.viewItem)
-                    }
-                    Divider()
-                }
-            }
-        }
-    }
-
-    Button({}) {
-        Text(text = "OPEN")
-    }
 }

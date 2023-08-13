@@ -15,7 +15,7 @@ data class DesignatedDateState constructor(
         "第三指定日",
         "第四指定日",
         "第五指定日",
-        "第一指定日",
+        "第六指定日",
         "第七指定日"
     ),
     val designatedDateMap: Map<String, List<NationalHoliday>> = mutableMapOf(
@@ -36,5 +36,10 @@ data class DesignatedDateState constructor(
     val isShowDataTimePicker2: Boolean = false,
     val isShowDataTimePicker3: Boolean = false,
     val isComplete: Boolean = false,
-    val isShowAddDesignatedDateModal: Boolean = false
+    val isShowAddDesignatedDateModal: Boolean = false,
+    val isShowDesignatedDateLabelModal: Boolean = false,
+    val selectDesignatedDateLabel: String = "",
+    val editTextDesignatedDateLabel: String = "",
+    val isShowEditDesignatedDateLabelModal: Boolean = false,
+    val isOkEditDesignatedDateLabelModal: Boolean = false
 )
