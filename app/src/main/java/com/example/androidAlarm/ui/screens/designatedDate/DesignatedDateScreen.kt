@@ -216,9 +216,11 @@ private fun TabLayout(
             }
         }
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(uiState.designatedDateMap[uiState.designatedDateMapKeyList[selectTabIndex]]!!) {
-                DesignatedDateList(designatedDateViewModel, it.date, it.holidayName)
-                Divider()
+            if (!uiState.designatedDateMap[uiState.designatedDateMapKeyList[selectTabIndex]].isNullOrEmpty()) {
+                items(uiState.designatedDateMap[uiState.designatedDateMapKeyList[selectTabIndex]]!!) {
+                    DesignatedDateList(designatedDateViewModel, it.date, it.holidayName)
+                    Divider()
+                }
             }
         }
     }

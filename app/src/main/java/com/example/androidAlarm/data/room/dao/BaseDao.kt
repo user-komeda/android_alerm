@@ -6,16 +6,16 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Update
 
 interface BaseDao<T> {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(entity: T): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(vararg entity: T)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(entities: Collection<T>)
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
+    @Update(onConflict = OnConflictStrategy.IGNORE)
     suspend fun update(entity: T)
 
     @Delete

@@ -1,14 +1,18 @@
+@file:Suppress("ExplicitItLambdaParameter")
+
 package com.example.androidAlarm.data.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.androidAlarm.data.model.NationalHoliday
-import com.example.androidAlarm.model.DesignatedDateGroup
 import javax.annotation.concurrent.Immutable
 
 @Entity(
-    tableName = "designatedDate"
+    tableName = "designatedDate",
+    indices = [Index(value = ["designatedDate", "designatedDateGroup"], unique = true)]
+
 )
 @Immutable
 data class DesignatedDaysEntity(
@@ -16,9 +20,29 @@ data class DesignatedDaysEntity(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long = 0,
     @ColumnInfo(name = "designatedDate") val designatedDate: String,
     @ColumnInfo(name = "designatedDateName") val designatedDateName: String,
-    @ColumnInfo(name = "designatedDateGroup") val designatedDateGroup: DesignatedDateGroup
+    @ColumnInfo(name = "designatedDateGroup") val designatedDateGroup: String
 
 ) {
+
+    companion object {
+        fun build(param: Map<String, List<NationalHoliday>>): List<DesignatedDaysEntity> {
+            val result = mutableListOf<DesignatedDaysEntity>()
+            param.keys.forEach { it ->
+                val key = it
+                param[it]?.forEach {
+                    result.add(
+                        DesignatedDaysEntity(
+                            designatedDate = it.date,
+                            designatedDateName = it.holidayName,
+                            designatedDateGroup = key
+                        )
+                    )
+                }
+            }
+            return result
+        }
+    }
+
     fun convertToNationalHoliday(): NationalHoliday {
         return NationalHoliday(designatedDate, designatedDateName)
     }

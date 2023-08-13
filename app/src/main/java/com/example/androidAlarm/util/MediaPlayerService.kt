@@ -23,17 +23,14 @@ class MediaPlayerService(
 ) : Service() {
     override fun onCreate() {
         super.onCreate()
-        Timber.d("create")
     }
 
     override fun onBind(p0: Intent?): IBinder? {
-        Timber.d("bind")
         return TODO("Provide the return value")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Timber.d("destroy")
         mediaPlayer.stop()
     }
 

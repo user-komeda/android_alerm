@@ -9,7 +9,7 @@ import com.example.androidAlarm.data.room.dao.DesignatedDaysDao
 import javax.inject.Inject
 import javax.inject.Provider
 
-@Database(entities = [DesignatedDaysEntity::class], version = 1)
+@Database(entities = [DesignatedDaysEntity::class], version = 3)
 abstract class AndroidAlarmDataBse : RoomDatabase() {
     abstract fun getArticleDao(): DesignatedDaysDao
 

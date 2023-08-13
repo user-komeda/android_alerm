@@ -15,7 +15,7 @@ data class DesignatedDateState constructor(
         "第三指定日",
         "第四指定日",
         "第五指定日",
-        "第一指定日",
+        "第六指定日",
         "第七指定日"
     ),
     val designatedDateMap: Map<String, List<NationalHoliday>> = mutableMapOf(

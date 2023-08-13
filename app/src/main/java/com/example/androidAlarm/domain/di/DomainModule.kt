@@ -4,6 +4,8 @@ import com.example.androidAlarm.data.entity.DesignatedDaysEntity
 import com.example.androidAlarm.data.model.NationalHoliday
 import com.example.androidAlarm.data.repository.DesignatedDaysRepository
 import com.example.androidAlarm.data.repository.NationalHolidayRepository
+import com.example.androidAlarm.domain.usecase.AddDesignatedDateUseCase
+import com.example.androidAlarm.domain.usecase.BaseNoParamUseCase
 import com.example.androidAlarm.domain.usecase.BaseUseCase
 import com.example.androidAlarm.domain.usecase.GetDesignatedDaysUseCase
 import com.example.androidAlarm.domain.usecase.GetNationalHolidayUseCase
@@ -28,7 +30,15 @@ object DomainModule {
     @Singleton
     fun provideGetDesignatedDaysUseCase(
         designatedDaysRepository: DesignatedDaysRepository
-    ): BaseUseCase<Long, List<DesignatedDaysEntity>> {
+    ): BaseNoParamUseCase<List<DesignatedDaysEntity>> {
         return GetDesignatedDaysUseCase(designatedDaysRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAddDesignatedDateUseCase(
+        designatedDaysRepository: DesignatedDaysRepository
+    ): BaseUseCase<Map<String, List<NationalHoliday>>, Unit> {
+        return AddDesignatedDateUseCase(designatedDaysRepository)
     }
 }
