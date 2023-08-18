@@ -1,6 +1,6 @@
 package com.example.androidAlarm.domain.di
 
-import com.example.androidAlarm.data.entity.DesignatedDaysEntity
+import com.example.androidAlarm.data.entity.DesignatedDaysKeyWithDesignatedDays
 import com.example.androidAlarm.data.model.NationalHoliday
 import com.example.androidAlarm.data.repository.DesignatedDaysRepository
 import com.example.androidAlarm.data.repository.NationalHolidayRepository
@@ -30,7 +30,7 @@ object DomainModule {
     @Singleton
     fun provideGetDesignatedDaysUseCase(
         designatedDaysRepository: DesignatedDaysRepository
-    ): BaseNoParamUseCase<List<DesignatedDaysEntity>> {
+    ): BaseNoParamUseCase<List<DesignatedDaysKeyWithDesignatedDays>> {
         return GetDesignatedDaysUseCase(designatedDaysRepository)
     }
 

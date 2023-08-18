@@ -7,7 +7,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.androidAlarm.data.entity.DesignatedDaysEntity
+import com.example.androidAlarm.data.entity.DesignatedDaysKeyWithDesignatedDays
 import com.example.androidAlarm.data.model.NationalHoliday
 import com.example.androidAlarm.domain.usecase.AddDesignatedDateUseCase
 import com.example.androidAlarm.domain.usecase.GetDesignatedDaysUseCase
@@ -332,11 +332,13 @@ class DesignatedDateViewModel @Inject constructor(
     }
 
     private fun getDesignatedDate() = viewModelScope.launch {
-        val result: Map<String, List<DesignatedDaysEntity>> =
-            getDesignatedDaysUseCase.invoke().groupBy { it.designatedDateGroup }
+        val result: List<DesignatedDaysKeyWithDesignatedDays> =
+            getDesignatedDaysUseCase.invoke()
+        val convertedResult = DesignatedDaysKeyWithDesignatedDays.convert(result)
+
         val resultMap = mutableMapOf<String, List<NationalHoliday>>()
-        result.keys.forEach {
-            val nationalHolidayList = result[it]?.map {
+        convertedResult.keys.forEach {
+            val nationalHolidayList = convertedResult[it]?.map {
                 NationalHoliday(it.designatedDate, it.designatedDateName)
             }
             resultMap[it] = nationalHolidayList!!
