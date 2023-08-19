@@ -7,6 +7,8 @@ import com.example.androidAlarm.data.repository.NationalHolidayRepository
 import com.example.androidAlarm.domain.usecase.AddDesignatedDateUseCase
 import com.example.androidAlarm.domain.usecase.BaseNoParamUseCase
 import com.example.androidAlarm.domain.usecase.BaseUseCase
+import com.example.androidAlarm.domain.usecase.DeleteAllDesignatedDateUseCase
+import com.example.androidAlarm.domain.usecase.DeleteDesignatedDateUseCase
 import com.example.androidAlarm.domain.usecase.GetDesignatedDaysUseCase
 import com.example.androidAlarm.domain.usecase.GetNationalHolidayUseCase
 import dagger.Module
@@ -38,7 +40,23 @@ object DomainModule {
     @Singleton
     fun provideAddDesignatedDateUseCase(
         designatedDaysRepository: DesignatedDaysRepository
-    ): BaseUseCase<Map<String, List<NationalHoliday>>, Unit> {
+    ): BaseUseCase<Map<Long, List<NationalHoliday>>, Unit> {
         return AddDesignatedDateUseCase(designatedDaysRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDeleteAllDesignatedDateUseCase(
+        designatedDaysRepository: DesignatedDaysRepository
+    ): BaseUseCase<Long, Unit> {
+        return DeleteAllDesignatedDateUseCase(designatedDaysRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDeleteDesignatedDateUseCase(
+        designatedDaysRepository: DesignatedDaysRepository
+    ): BaseUseCase<NationalHoliday, Unit> {
+        return DeleteDesignatedDateUseCase(designatedDaysRepository)
     }
 }

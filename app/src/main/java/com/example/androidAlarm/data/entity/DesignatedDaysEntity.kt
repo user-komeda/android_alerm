@@ -28,12 +28,12 @@ data class DesignatedDaysEntity(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long = 0,
     @ColumnInfo(name = "designatedDate") val designatedDate: String = "",
     @ColumnInfo(name = "designatedDateName") val designatedDateName: String = "",
-    @ColumnInfo(name = "designatedDaysKeyId") val designatedDaysKeyId: String = ""
+    @ColumnInfo(name = "designatedDaysKeyId") val designatedDaysKeyId: Long = 0
 
 ) {
 
     companion object {
-        fun build(param: Map<String, List<NationalHoliday>>): List<DesignatedDaysEntity> {
+        fun build(param: Map<Long, List<NationalHoliday>>): List<DesignatedDaysEntity> {
             val result = mutableListOf<DesignatedDaysEntity>()
             param.keys.forEach { it ->
                 val key = it
@@ -52,6 +52,6 @@ data class DesignatedDaysEntity(
     }
 
     fun convertToNationalHoliday(): NationalHoliday {
-        return NationalHoliday(designatedDate, designatedDateName)
+        return NationalHoliday(date = designatedDate, holidayName = designatedDateName)
     }
 }

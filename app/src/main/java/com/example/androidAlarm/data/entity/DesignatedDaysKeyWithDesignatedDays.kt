@@ -10,9 +10,9 @@ data class DesignatedDaysKeyWithDesignatedDays(
 ) {
 
     companion object {
-        fun convert(params: List<DesignatedDaysKeyWithDesignatedDays>): Map<String, List<DesignatedDaysEntity>> {
+        fun convert(params: List<DesignatedDaysKeyWithDesignatedDays>): Map<Long, List<DesignatedDaysEntity>> {
             return params.associateBy(
-                { it.designatedDaysKeyEntity.designatedDaysKeyName },
+                { it.designatedDaysKeyEntity.id },
                 { it.designatedDaysEntityList }
             )
         }

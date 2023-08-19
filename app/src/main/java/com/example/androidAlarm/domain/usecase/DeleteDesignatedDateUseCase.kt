@@ -4,11 +4,10 @@ import com.example.androidAlarm.data.model.NationalHoliday
 import com.example.androidAlarm.data.repository.DesignatedDaysRepository
 import javax.inject.Inject
 
-class AddDesignatedDateUseCase @Inject constructor(
+class DeleteDesignatedDateUseCase @Inject constructor(
     private val designatedDaysRepository: DesignatedDaysRepository
-) : BaseUseCase<Map<Long, List<NationalHoliday>>, Unit> {
-
-    override suspend fun invoke(param: Map<Long, List<NationalHoliday>>) {
-        return designatedDaysRepository.addDesignateDate(param)
+) : BaseUseCase<NationalHoliday, Unit> {
+    override suspend fun invoke(param: NationalHoliday) {
+        return designatedDaysRepository.deleteDesignatedDate(param)
     }
 }

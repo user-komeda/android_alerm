@@ -11,7 +11,15 @@ class DesignatedDaysRepositoryImpl(private val designatedDaysDao: DesignatedDays
         return designatedDaysDao.selectDesignatedDaysKeyWithDesignatedDays()
     }
 
-    override suspend fun addDesignateDate(param: Map<String, List<NationalHoliday>>) {
+    override suspend fun addDesignateDate(param: Map<Long, List<NationalHoliday>>) {
         return designatedDaysDao.insertAll(DesignatedDaysEntity.build(param))
+    }
+
+    override suspend fun deleteDesignatedDate(param: NationalHoliday) {
+        return designatedDaysDao.delete(NationalHoliday.convertToDesignatedDaysEntity(param))
+    }
+
+    override suspend fun deleteAllDesignatedDate(param: Long) {
+        return designatedDaysDao.deleteAllDesignatedDays(param)
     }
 }

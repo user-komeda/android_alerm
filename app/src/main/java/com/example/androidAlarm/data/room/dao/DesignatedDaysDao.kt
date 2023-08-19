@@ -15,4 +15,7 @@ abstract class DesignatedDaysDao : BaseDao<DesignatedDaysEntity> {
     @Transaction
     @Query("select * from DesignatedDaysKey where id IN (SELECT DISTINCT(designatedDaysKeyId) FROM designatedDate)")
     abstract suspend fun selectDesignatedDaysKeyWithDesignatedDays(): List<DesignatedDaysKeyWithDesignatedDays>
+
+    @Query("delete from designatedDate where designatedDaysKeyId==:param")
+    abstract suspend fun deleteAllDesignatedDays(param: Long): Unit
 }

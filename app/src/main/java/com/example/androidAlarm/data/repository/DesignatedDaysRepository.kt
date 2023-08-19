@@ -6,5 +6,9 @@ import com.example.androidAlarm.data.model.NationalHoliday
 interface DesignatedDaysRepository {
     suspend fun getAllDesignatedDate(): List<DesignatedDaysKeyWithDesignatedDays>
 
-    suspend fun addDesignateDate(param: Map<String, List<NationalHoliday>>): Unit
+    suspend fun addDesignateDate(param: Map<Long, List<NationalHoliday>>): Unit
+
+    suspend fun deleteDesignatedDate(param: NationalHoliday): Unit
+
+    suspend fun deleteAllDesignatedDate(param: Long): Unit
 }

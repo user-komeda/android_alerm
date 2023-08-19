@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "DesignatedDaysKey")
 data class DesignatedDaysKeyEntity(
-    @PrimaryKey() @ColumnInfo(name = "id") val id: String = "",
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long = 0,
     @ColumnInfo val designatedDaysKeyName: String = ""
 )

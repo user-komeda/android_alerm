@@ -22,6 +22,7 @@ object DataBaseModule {
     ): AndroidAlarmDataBse {
         return Room.databaseBuilder(application, AndroidAlarmDataBse::class.java, "alarm_database")
             .fallbackToDestructiveMigration()
+            .createFromAsset("database/init.db")
             .addCallback(callback)
             .build()
     }
