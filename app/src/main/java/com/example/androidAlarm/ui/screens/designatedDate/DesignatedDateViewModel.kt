@@ -142,7 +142,6 @@ class DesignatedDateViewModel @Inject constructor(
         updateDesignatedDateName(designatedDateName = designatedDateName)
 
         copyMap[_uiState.value.selectTabIndex] = copyList
-        addDesignatedDate(copyMap)
         _uiState.update {
             it.copy(
                 designatedDateMap = copyMap
@@ -179,11 +178,6 @@ class DesignatedDateViewModel @Inject constructor(
             it.date
         }
         addDesignatedDate(copyMap)
-        _uiState.update {
-            it.copy(
-                designatedDateMap = copyMap
-            )
-        }
     }
 
     fun addAllDesignatedMap(designatedDate: LocalDate, designatedDateName: String) {
@@ -219,7 +213,6 @@ class DesignatedDateViewModel @Inject constructor(
         addDesignatedDate(copyMap)
         _uiState.update {
             it.copy(
-                designatedDateMap = copyMap,
                 isComplete = false
             )
         }
@@ -237,7 +230,6 @@ class DesignatedDateViewModel @Inject constructor(
             deleteDesignatedDate(NationalHoliday(1549, it.date, it.holidayName))
         }
         copyMap[_uiState.value.selectTabIndex] = copyList
-        addDesignatedDate(copyMap)
         updateShowDesignatedModal(false)
         _uiState.update {
             it.copy(
@@ -319,7 +311,6 @@ class DesignatedDateViewModel @Inject constructor(
                 designateDateLabelName
             )
         )
-        addDesignatedDate(copyMap)
         _uiState.update {
             it.copy(
                 designatedDateMapKeyList = copyList,
@@ -348,11 +339,6 @@ class DesignatedDateViewModel @Inject constructor(
         copyMap[_uiState.value.selectTabIndex] = copyList.distinctBy { it.date }
         addDesignatedDate(copyMap)
         Timber.d(copyMap.toString())
-        _uiState.update {
-            it.copy(
-                designatedDateMap = copyMap
-            )
-        }
     }
 
     private fun getDesignatedDate() = viewModelScope.launch {
@@ -362,7 +348,11 @@ class DesignatedDateViewModel @Inject constructor(
         val resultMap = mutableMapOf<Long, List<NationalHoliday>>()
         convertedResult.keys.forEach {
             val nationalHolidayList = convertedResult[it]?.map {
-                NationalHoliday(date = it.designatedDate, holidayName = it.designatedDateName)
+                NationalHoliday(
+                    id = it.id,
+                    date = it.designatedDate,
+                    holidayName = it.designatedDateName
+                )
             }
             resultMap[it] = nationalHolidayList!!
         }
@@ -374,7 +364,23 @@ class DesignatedDateViewModel @Inject constructor(
     }
 
     private fun addDesignatedDate(param: Map<Long, List<NationalHoliday>>) = viewModelScope.launch {
-        addDesignatedDateUseCase.invoke(param)
+        val rowIdList: List<Long> = addDesignatedDateUseCase.invoke(param)
+        val nationalHolidayList: List<NationalHoliday> = param[_uiState.value.selectTabIndex]!!
+        val newNationalHolidayList = nationalHolidayList.mapIndexed { index, nationalHoliday ->
+            NationalHoliday(
+                rowIdList[index],
+                nationalHoliday.date,
+                nationalHoliday.holidayName
+            )
+        }
+
+        val copyMap = _uiState.value.designatedDateMap.toMutableMap()
+        copyMap[_uiState.value.selectTabIndex] = newNationalHolidayList
+        _uiState.update {
+            it.copy(
+                designatedDateMap = copyMap
+            )
+        }
     }
 
     private fun updateDesignatedDate(nationalHoliday: NationalHoliday) = viewModelScope.launch {

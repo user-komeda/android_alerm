@@ -42,7 +42,7 @@ object DomainModule {
     @Singleton
     fun provideAddDesignatedDateUseCase(
         designatedDaysRepository: DesignatedDaysRepository
-    ): BaseUseCase<Map<Long, List<NationalHoliday>>, Unit> {
+    ): BaseUseCase<Map<Long, List<NationalHoliday>>, List<Long>> {
         return AddDesignatedDateUseCase(designatedDaysRepository)
     }
 

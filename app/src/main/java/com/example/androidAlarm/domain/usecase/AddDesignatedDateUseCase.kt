@@ -6,9 +6,9 @@ import javax.inject.Inject
 
 class AddDesignatedDateUseCase @Inject constructor(
     private val designatedDaysRepository: DesignatedDaysRepository
-) : BaseUseCase<Map<Long, List<NationalHoliday>>, Unit> {
+) : BaseUseCase<Map<Long, List<NationalHoliday>>, List<Long>> {
 
-    override suspend fun invoke(param: Map<Long, List<NationalHoliday>>) {
+    override suspend fun invoke(param: Map<Long, List<NationalHoliday>>): List<Long> {
         return designatedDaysRepository.addDesignateDate(param)
     }
 }
