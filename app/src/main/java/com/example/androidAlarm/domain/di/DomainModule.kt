@@ -1,5 +1,6 @@
 package com.example.androidAlarm.domain.di
 
+import com.example.androidAlarm.data.entity.DesignatedDaysKeyEntity
 import com.example.androidAlarm.data.entity.DesignatedDaysKeyWithDesignatedDays
 import com.example.androidAlarm.data.model.NationalHoliday
 import com.example.androidAlarm.data.repository.DesignatedDaysRepository
@@ -11,6 +12,7 @@ import com.example.androidAlarm.domain.usecase.DeleteAllDesignatedDateUseCase
 import com.example.androidAlarm.domain.usecase.DeleteDesignatedDateUseCase
 import com.example.androidAlarm.domain.usecase.GetDesignatedDaysUseCase
 import com.example.androidAlarm.domain.usecase.GetNationalHolidayUseCase
+import com.example.androidAlarm.domain.usecase.UpdateDesignateDateUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -58,5 +60,21 @@ object DomainModule {
         designatedDaysRepository: DesignatedDaysRepository
     ): BaseUseCase<NationalHoliday, Unit> {
         return DeleteDesignatedDateUseCase(designatedDaysRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUpdateDesignatedDateUseCase(
+        designatedDaysRepository: DesignatedDaysRepository
+    ): BaseUseCase<NationalHoliday, Unit> {
+        return UpdateDesignateDateUseCase(designatedDaysRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUpdateDesignatedDateLabelUseCase(
+        designatedDaysRepository: DesignatedDaysRepository
+    ): BaseUseCase<DesignatedDaysKeyEntity, Unit> {
+        return provideUpdateDesignatedDateLabelUseCase(designatedDaysRepository)
     }
 }

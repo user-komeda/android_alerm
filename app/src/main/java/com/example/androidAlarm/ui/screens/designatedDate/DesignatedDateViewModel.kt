@@ -1,4 +1,4 @@
-@file:Suppress("TooManyFunctions", "MagicNumber")
+@file:Suppress("TooManyFunctions", "MagicNumber", "LongParameterList")
 
 package com.example.androidAlarm.ui.screens.designatedDate
 
@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.androidAlarm.data.entity.DesignatedDaysKeyEntity
 import com.example.androidAlarm.data.entity.DesignatedDaysKeyWithDesignatedDays
 import com.example.androidAlarm.data.model.NationalHoliday
 import com.example.androidAlarm.domain.usecase.AddDesignatedDateUseCase
@@ -14,6 +15,8 @@ import com.example.androidAlarm.domain.usecase.DeleteAllDesignatedDateUseCase
 import com.example.androidAlarm.domain.usecase.DeleteDesignatedDateUseCase
 import com.example.androidAlarm.domain.usecase.GetDesignatedDaysUseCase
 import com.example.androidAlarm.domain.usecase.GetNationalHolidayUseCase
+import com.example.androidAlarm.domain.usecase.UpdateDesignateDateUseCase
+import com.example.androidAlarm.domain.usecase.UpdateDesignatedDateLabelUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +24,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -32,6 +34,8 @@ class DesignatedDateViewModel @Inject constructor(
     private val getNationalHolidayUseCase: GetNationalHolidayUseCase,
     private val getDesignatedDaysUseCase: GetDesignatedDaysUseCase,
     private val addDesignatedDateUseCase: AddDesignatedDateUseCase,
+    private val updateDesignateDateUseCase: UpdateDesignateDateUseCase,
+    private val updateDesignatedDateLabelUseCase: UpdateDesignatedDateLabelUseCase,
     private val deleteDesignatedDateUseCase: DeleteDesignatedDateUseCase,
     private val deleteAllDesignatedDateUseCase: DeleteAllDesignatedDateUseCase
 ) : ViewModel() {
@@ -94,7 +98,7 @@ class DesignatedDateViewModel @Inject constructor(
         }
     }
 
-    fun updateDesignatedDate(designatedDate: LocalDateTime) {
+    fun updateDesignatedDate(designatedDate: LocalDate) {
         _uiState.update {
             it.copy(
                 designatedDate = designatedDate
@@ -103,20 +107,26 @@ class DesignatedDateViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun updateDesignatedObject(designatedDate: LocalDateTime, designatedDateName: String) {
+    fun updateDesignatedObject(designatedDate: LocalDate, designatedDateName: String) {
         val copyMap = _uiState.value.designatedDateMap.toMutableMap()
         val copyList = copyMap[_uiState.value.selectTabIndex]!!.toMutableList()
-
+        Timber.d(copyList.toString())
         copyList.filter {
             it.holidayName == _uiState.value.designatedDateName && LocalDate.parse(
                 it.date,
-                DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            ).atStartOfDay() == _uiState.value.designatedDate
+            ) == _uiState.value.designatedDate
         }.forEach {
             copyList.remove(it)
+            updateDesignatedDate(
+                NationalHoliday(
+                    1618,
+                    designatedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                    designatedDateName
+                )
+            )
             copyList.add(
                 NationalHoliday(
-                    date = designatedDate.toString(),
+                    date = designatedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                     holidayName = designatedDateName
                 )
             )
@@ -148,7 +158,7 @@ class DesignatedDateViewModel @Inject constructor(
         }
     }
 
-    fun addDesignatedMap(designatedDate: LocalDateTime, designatedDateName: String) {
+    fun addDesignatedMap(designatedDate: LocalDate, designatedDateName: String) {
         val copyMap = _uiState.value.designatedDateMap.toMutableMap()
 
         val copyList: MutableList<NationalHoliday> = if (copyMap.isEmpty()) {
@@ -176,7 +186,7 @@ class DesignatedDateViewModel @Inject constructor(
         }
     }
 
-    fun addAllDesignatedMap(designatedDate: LocalDateTime, designatedDateName: String) {
+    fun addAllDesignatedMap(designatedDate: LocalDate, designatedDateName: String) {
         if (!_uiState.value.isComplete) {
             updateDesignatedDate(designatedDate = designatedDate)
             updateDesignatedDateName(designatedDateName = designatedDateName)
@@ -295,10 +305,20 @@ class DesignatedDateViewModel @Inject constructor(
             _uiState.value.designatedDateMapKeyList.indexOf(_uiState.value.selectDesignatedDateLabel)
         val copyMap = _uiState.value.designatedDateMap.toMutableMap()
         val copyList = _uiState.value.designatedDateMapKeyList.toMutableList()
+        Timber.d(copyMap.toString())
+        Timber.d(_uiState.value.selectTabIndex.toString())
         val value = copyMap[_uiState.value.selectTabIndex]
         copyList[index] = designateDateLabelName
         copyMap.remove(_uiState.value.selectTabIndex)
-        copyMap[_uiState.value.selectTabIndex] = value!!
+        if (!value.isNullOrEmpty()) {
+            copyMap[_uiState.value.selectTabIndex] = value
+        }
+        updateDesignatedDateLabel(
+            DesignatedDaysKeyEntity(
+                _uiState.value.selectTabIndex,
+                designateDateLabelName
+            )
+        )
         addDesignatedDate(copyMap)
         _uiState.update {
             it.copy(
@@ -356,6 +376,16 @@ class DesignatedDateViewModel @Inject constructor(
     private fun addDesignatedDate(param: Map<Long, List<NationalHoliday>>) = viewModelScope.launch {
         addDesignatedDateUseCase.invoke(param)
     }
+
+    private fun updateDesignatedDate(nationalHoliday: NationalHoliday) = viewModelScope.launch {
+        Timber.d(nationalHoliday.toString())
+        updateDesignateDateUseCase.invoke(nationalHoliday)
+    }
+
+    private fun updateDesignatedDateLabel(designatedDaysKeyEntity: DesignatedDaysKeyEntity) =
+        viewModelScope.launch {
+            updateDesignatedDateLabelUseCase.invoke(designatedDaysKeyEntity)
+        }
 
     private fun deleteDesignatedDate(nationalHoliday: NationalHoliday) = viewModelScope.launch {
         deleteDesignatedDateUseCase.invoke(nationalHoliday)

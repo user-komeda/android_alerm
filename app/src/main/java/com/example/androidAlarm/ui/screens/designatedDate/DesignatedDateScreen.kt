@@ -180,7 +180,6 @@ private fun DesignatedDateList(
                             designatedDate,
                             DateTimeFormatter.ofPattern("yyyy-MM-dd")
                         )
-                        .atStartOfDay()
                 )
                 designatedDateViewModel.updateDesignatedDateName(designatedDateName = designatedDateName)
             }
@@ -258,7 +257,7 @@ private fun DatePickerDialogSample(
                 LocalDateTime.ofInstant(
                     instant,
                     ZoneId.systemDefault()
-                ),
+                ).toLocalDate(),
                 uiState.designatedDateName
             )
         },
@@ -287,7 +286,7 @@ private fun DatePickerDialogSample2(
                 LocalDateTime.ofInstant(
                     instant,
                     ZoneId.systemDefault()
-                ),
+                ).toLocalDate(),
                 uiState.designatedDateName
             )
         },
@@ -317,8 +316,7 @@ private fun DatePickerDialogSample3(
                 LocalDateTime.ofInstant(
                     instant,
                     ZoneId.systemDefault()
-                ),
-
+                ).toLocalDate(),
                 uiState.designatedDateName
             )
         },
@@ -416,6 +414,7 @@ private fun EditDesignatedDateLabelModal(
                 Row(modifier = Modifier.padding(top = 16.dp)) {
                     TextButton(modifier = Modifier.weight(1f), onClick = {
                         designatedDateViewModel.updateDesignatedDateLabel(uiState.editTextDesignatedDateLabel)
+                        designatedDateViewModel.updateShowEditDesignatedDateLabel(false)
                     }) {
                         Text(text = "OK")
                     }

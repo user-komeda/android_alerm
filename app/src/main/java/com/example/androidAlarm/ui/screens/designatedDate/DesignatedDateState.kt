@@ -5,7 +5,7 @@ package com.example.androidAlarm.ui.screens.designatedDate
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.androidAlarm.data.model.NationalHoliday
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 data class DesignatedDateState constructor(
@@ -30,7 +30,7 @@ data class DesignatedDateState constructor(
     val selectTabIndex: Long = 1,
     val isShowDesignatedDateModal: Boolean = false,
 //    TODO下記二つをNationalHolidayObjectにまとめる
-    val designatedDate: LocalDateTime = LocalDateTime.now(),
+    val designatedDate: LocalDate = LocalDate.now(),
     val designatedDateName: String = "",
     val isShowDataTimePicker: Boolean = false,
     val isShowDataTimePicker2: Boolean = false,
