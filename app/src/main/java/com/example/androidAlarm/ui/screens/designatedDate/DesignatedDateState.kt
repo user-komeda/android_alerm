@@ -5,7 +5,7 @@ package com.example.androidAlarm.ui.screens.designatedDate
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.androidAlarm.data.model.NationalHoliday
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 data class DesignatedDateState constructor(
@@ -18,19 +18,19 @@ data class DesignatedDateState constructor(
         "第六指定日",
         "第七指定日"
     ),
-    val designatedDateMap: Map<String, List<NationalHoliday>> = mutableMapOf(
-        designatedDateMapKeyList[0] to ArrayList<NationalHoliday>(),
-        designatedDateMapKeyList[1] to ArrayList<NationalHoliday>(),
-        designatedDateMapKeyList[2] to ArrayList<NationalHoliday>(),
-        designatedDateMapKeyList[3] to ArrayList<NationalHoliday>(),
-        designatedDateMapKeyList[4] to ArrayList<NationalHoliday>(),
-        designatedDateMapKeyList[5] to ArrayList<NationalHoliday>(),
-        designatedDateMapKeyList[6] to ArrayList<NationalHoliday>(),
+    val designatedDateMap: Map<Long, List<NationalHoliday>> = mutableMapOf(
+        1L to ArrayList<NationalHoliday>(),
+        2L to ArrayList<NationalHoliday>(),
+        3L to ArrayList<NationalHoliday>(),
+        4L to ArrayList<NationalHoliday>(),
+        5L to ArrayList<NationalHoliday>(),
+        6L to ArrayList<NationalHoliday>(),
+        7L to ArrayList<NationalHoliday>(),
     ),
-    val selectTabIndex: Int = 0,
+    val selectTabIndex: Long = 1,
     val isShowDesignatedDateModal: Boolean = false,
 //    TODO下記二つをNationalHolidayObjectにまとめる
-    val designatedDate: LocalDateTime = LocalDateTime.now(),
+    val designatedDate: LocalDate = LocalDate.now(),
     val designatedDateName: String = "",
     val isShowDataTimePicker: Boolean = false,
     val isShowDataTimePicker2: Boolean = false,

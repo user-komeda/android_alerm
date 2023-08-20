@@ -107,11 +107,9 @@ fun DesignatedDateScreen(
 
 @Composable
 private fun AppBar() {
-    TopAppBar(
-        title = {
-            Text(text = "指定日の設定")
-        }
-    )
+    TopAppBar(title = {
+        Text(text = "指定日の設定")
+    })
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -182,7 +180,6 @@ private fun DesignatedDateList(
                             designatedDate,
                             DateTimeFormatter.ofPattern("yyyy-MM-dd")
                         )
-                        .atStartOfDay()
                 )
                 designatedDateViewModel.updateDesignatedDateName(designatedDateName = designatedDateName)
             }
@@ -195,7 +192,7 @@ private fun DesignatedDateList(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun TabLayout(
-    selectTabIndex: Int,
+    selectTabIndex: Long,
     designatedDateViewModel: DesignatedDateViewModel,
     uiState: DesignatedDateState
 ) {
@@ -205,19 +202,19 @@ private fun TabLayout(
             .fillMaxWidth()
             .padding(top = 30.dp)
     ) {
-        ScrollableTabRow(selectedTabIndex = selectTabIndex, edgePadding = 0.dp) {
+        ScrollableTabRow(selectedTabIndex = selectTabIndex.toInt() - 1, edgePadding = 0.dp) {
             keyList.forEachIndexed { index, title ->
                 Tab(
                     text = { Text(text = title) },
-                    selected = selectTabIndex == index,
-                    onClick = { designatedDateViewModel.update(index) },
+                    selected = selectTabIndex.toInt() == index + 1,
+                    onClick = { designatedDateViewModel.update(index + 1L) },
                     icon = { Icons.Default.Home }
                 )
             }
         }
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            if (!uiState.designatedDateMap[uiState.designatedDateMapKeyList[selectTabIndex]].isNullOrEmpty()) {
-                items(uiState.designatedDateMap[uiState.designatedDateMapKeyList[selectTabIndex]]!!) {
+            if (!uiState.designatedDateMap[selectTabIndex].isNullOrEmpty()) {
+                items(uiState.designatedDateMap[selectTabIndex]!!) {
                     DesignatedDateList(designatedDateViewModel, it.date, it.holidayName)
                     Divider()
                 }
@@ -260,7 +257,7 @@ private fun DatePickerDialogSample(
                 LocalDateTime.ofInstant(
                     instant,
                     ZoneId.systemDefault()
-                ),
+                ).toLocalDate(),
                 uiState.designatedDateName
             )
         },
@@ -289,7 +286,7 @@ private fun DatePickerDialogSample2(
                 LocalDateTime.ofInstant(
                     instant,
                     ZoneId.systemDefault()
-                ),
+                ).toLocalDate(),
                 uiState.designatedDateName
             )
         },
@@ -319,8 +316,7 @@ private fun DatePickerDialogSample3(
                 LocalDateTime.ofInstant(
                     instant,
                     ZoneId.systemDefault()
-                ),
-
+                ).toLocalDate(),
                 uiState.designatedDateName
             )
         },
@@ -416,12 +412,10 @@ private fun EditDesignatedDateLabelModal(
                     )
                 }
                 Row(modifier = Modifier.padding(top = 16.dp)) {
-                    TextButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            designatedDateViewModel.updateDesignatedDateLabel(uiState.editTextDesignatedDateLabel)
-                        }
-                    ) {
+                    TextButton(modifier = Modifier.weight(1f), onClick = {
+                        designatedDateViewModel.updateDesignatedDateLabel(uiState.editTextDesignatedDateLabel)
+                        designatedDateViewModel.updateShowEditDesignatedDateLabel(false)
+                    }) {
                         Text(text = "OK")
                     }
                     TextButton(
