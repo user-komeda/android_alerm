@@ -8,7 +8,7 @@ interface DesignatedDaysRepository {
 
     suspend fun addDesignateDate(param: Map<Long, List<NationalHoliday>>): List<Long>
 
-    suspend fun updateDesignatedDate(nationalHoliday: NationalHoliday): Unit
+    suspend fun updateDesignatedDate(param: NationalHoliday): Unit
 
     suspend fun deleteDesignatedDate(param: NationalHoliday): Unit
 
