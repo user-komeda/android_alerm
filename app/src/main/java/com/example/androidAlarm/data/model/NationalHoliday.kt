@@ -9,16 +9,16 @@ import com.squareup.moshi.JsonClass
 data class NationalHoliday(
     val id: Long = 0,
     @Json(name = "date") val date: String,
-    @Json(name = "name") val holidayName: String
+    @Json(name = "name") val holidayName: String,
+    val keyId: Long = 0
 ) {
     companion object {
         fun convertToDesignatedDaysEntity(param: NationalHoliday): DesignatedDaysEntity {
             return DesignatedDaysEntity(
-//                TODO deleteするとIDが変わってしまう
                 id = param.id,
                 designatedDate = param.date,
                 designatedDateName = param.holidayName,
-                designatedDaysKeyId = 1
+                designatedDaysKeyId = param.keyId
             )
         }
     }

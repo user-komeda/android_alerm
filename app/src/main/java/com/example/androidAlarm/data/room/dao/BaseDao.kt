@@ -13,7 +13,7 @@ interface BaseDao<T> {
     suspend fun insertAll(vararg entity: T)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAll(entities: Collection<T>)
+    suspend fun insertAll(entities: Collection<T>): List<Long>
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     suspend fun update(entity: T)

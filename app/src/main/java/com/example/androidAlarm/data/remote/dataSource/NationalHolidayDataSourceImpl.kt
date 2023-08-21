@@ -11,7 +11,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 private interface NationalHolidayApi {
-    @GET(value = "2020")
+    @GET(value = "nationalHolidays")
     suspend fun getNationalHoliday(): Response<List<NationalHoliday>>
 }
 
@@ -20,7 +20,7 @@ class NationalHolidayDataSourceImpl @Inject constructor(
     okhttpCallFactory: Call.Factory,
 ) : NationalHolidayDataSource {
     private val networkApi =
-        Retrofit.Builder().baseUrl("https://api.national-holidays.jp/").callFactory(okhttpCallFactory)
+        Retrofit.Builder().baseUrl("http://10.0.2.2:3000").callFactory(okhttpCallFactory)
             .addConverterFactory(
                 MoshiConverterFactory.create(moshi)
             ).build().create(NationalHolidayApi::class.java)
