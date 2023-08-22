@@ -32,6 +32,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     }
 
     fun updateShowModalFlag() {
+        Timber.d("ulafm")
         _uiState.update {
             it.copy(
                 isShowModal = !_uiState.value.isShowModal

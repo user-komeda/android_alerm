@@ -34,7 +34,6 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -53,13 +52,13 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DesignatedDateScreen(
     designatedDateViewModel: DesignatedDateViewModel,
-    navigateToCalendar: () -> Unit
+    navigateToCalendar: (String) -> Unit
 ) {
+    val uiState by designatedDateViewModel.uiState.collectAsState()
     Scaffold(
         topBar = { AppBar() },
-        bottomBar = { BottomBar(navigateToCalendar, designatedDateViewModel) }
+        bottomBar = { BottomBar(navigateToCalendar, designatedDateViewModel, uiState) }
     ) {
-        val uiState by designatedDateViewModel.uiState.collectAsState()
         TabLayout(
             selectTabIndex = uiState.selectTabIndex,
             designatedDateViewModel,
@@ -115,8 +114,9 @@ private fun AppBar() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun BottomBar(
-    navigateToCalendar: () -> Unit,
-    designatedDateViewModel: DesignatedDateViewModel
+    navigateToCalendar: (String) -> Unit,
+    designatedDateViewModel: DesignatedDateViewModel,
+    uiState: DesignatedDateState
 ) {
     Column {
         Row(
@@ -148,7 +148,17 @@ private fun BottomBar(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            TextButton(modifier = Modifier.weight(1f), onClick = navigateToCalendar) {
+            TextButton(
+                modifier = Modifier.weight(1f),
+                onClick = {
+                    navigateToCalendar(
+                        listOf(
+                            uiState.designatedDateMapKeyList[uiState.selectTabIndex.toInt() - 1],
+                            uiState.selectTabIndex.toString()
+                        ).joinToString(separator = ",")
+                    )
+                }
+            ) {
                 Text(text = "カレンダーから選択")
             }
             TextButton(
@@ -287,7 +297,8 @@ private fun DatePickerDialogSample2(
                     instant,
                     ZoneId.systemDefault()
                 ).toLocalDate(),
-                uiState.designatedDateName
+                uiState.designatedDateName,
+                uiState.selectTabIndex
             )
         },
         onCClickDismissButton = { designatedDateViewModel.updateShowDateTimePicker2(false) },
