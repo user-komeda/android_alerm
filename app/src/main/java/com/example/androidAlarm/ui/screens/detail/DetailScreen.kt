@@ -24,10 +24,8 @@ import timber.log.Timber
 fun DetailScreen(
     detailViewModel: DetailViewModel
 ) {
-//    val uiState = detailViewModel.uiState.collectAsState()
-    val detailConfigItem = DetailConfigItem()
     Timber.d(detailViewModel.toString())
-
+    val detailConfigItem = DetailConfigItem()
     Scaffold(
         bottomBar = { BottomBar() },
         topBar = { AppBar() }

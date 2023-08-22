@@ -44,9 +44,12 @@ class DesignatedDateViewModel @Inject constructor(
 
     init {
         getDesignatedDate()
+        Timber.d(_uiState.value.selectTabIndex.toString())
     }
 
     fun update(index: Long) {
+        Timber.d("calenderIndex")
+        Timber.d(index.toString())
         _uiState.update {
             it.copy(
                 selectTabIndex = index
@@ -116,8 +119,6 @@ class DesignatedDateViewModel @Inject constructor(
                 DateTimeFormatter.ofPattern("yyyy-MM-dd")
             ) == _uiState.value.designatedDate
         }.forEach {
-            Timber.d("it")
-            Timber.d(it.toString())
             val updatedNationalHoliday = NationalHoliday(
                 id = it.id,
                 date = designatedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
@@ -125,7 +126,6 @@ class DesignatedDateViewModel @Inject constructor(
                 keyId = _uiState.value.selectTabIndex
             )
             copyList.remove(it)
-            Timber.d(updatedNationalHoliday.toString())
             updateDesignatedDate(
                 updatedNationalHoliday
             )
@@ -151,9 +151,11 @@ class DesignatedDateViewModel @Inject constructor(
         }
     }
 
-    fun addDesignatedMap(designatedDate: LocalDate, designatedDateName: String) {
+    fun addDesignatedMap(designatedDate: LocalDate, designatedDateName: String, keyId: Long) {
         val copyMap = _uiState.value.designatedDateMap.toMutableMap()
-
+        Timber.d("calender")
+        Timber.d(_uiState.value.selectTabIndex.toString())
+        Timber.d(_uiState.value.designatedDateMap.toString())
         val copyList: MutableList<NationalHoliday> =
             if (copyMap[_uiState.value.selectTabIndex].isNullOrEmpty()) {
                 mutableListOf<NationalHoliday>()
@@ -165,10 +167,10 @@ class DesignatedDateViewModel @Inject constructor(
             NationalHoliday(
                 date = designatedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 holidayName = designatedDateName,
-                keyId = _uiState.value.selectTabIndex
+                keyId = keyId
             )
         )
-        copyMap[_uiState.value.selectTabIndex] = copyList.distinctBy {
+        copyMap[keyId] = copyList.distinctBy {
             it.date
         }
         addDesignatedDate(copyMap)
@@ -295,8 +297,6 @@ class DesignatedDateViewModel @Inject constructor(
             _uiState.value.designatedDateMapKeyList.indexOf(_uiState.value.selectDesignatedDateLabel)
         val copyMap = _uiState.value.designatedDateMap.toMutableMap()
         val copyList = _uiState.value.designatedDateMapKeyList.toMutableList()
-        Timber.d(copyMap.toString())
-        Timber.d(_uiState.value.selectTabIndex.toString())
         val value = copyMap[_uiState.value.selectTabIndex]
         copyList[index] = designateDateLabelName
         copyMap.remove(_uiState.value.selectTabIndex)
@@ -336,12 +336,12 @@ class DesignatedDateViewModel @Inject constructor(
 
         copyMap[_uiState.value.selectTabIndex] = copyList.distinctBy { it.date }
         addDesignatedDate(copyMap)
-        Timber.d(copyMap.toString())
     }
 
     private fun getDesignatedDate() = viewModelScope.launch {
         val result: List<DesignatedDaysKeyWithDesignatedDays> = getDesignatedDaysUseCase.invoke()
         val convertedResult = DesignatedDaysKeyWithDesignatedDays.convert(result)
+        Timber.d("valender")
 
         val resultMap = mutableMapOf<Long, List<NationalHoliday>>()
         convertedResult.keys.forEach {
@@ -369,7 +369,6 @@ class DesignatedDateViewModel @Inject constructor(
         val startIndex = lastIndex - nationalHolidayList.size
 
         val newNationalHolidayList = nationalHolidayList.mapIndexed { index, nationalHoliday ->
-            Timber.d(rowIdList[startIndex + index].toString())
             NationalHoliday(
                 rowIdList[startIndex + index],
                 nationalHoliday.date,
@@ -388,7 +387,6 @@ class DesignatedDateViewModel @Inject constructor(
     }
 
     private fun updateDesignatedDate(nationalHoliday: NationalHoliday) = viewModelScope.launch {
-        Timber.d(nationalHoliday.toString())
         updateDesignateDateUseCase.invoke(nationalHoliday)
     }
 

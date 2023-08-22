@@ -8,8 +8,10 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.example.androidAlarm.ui.screens.alarmTime.AlarmTimeScreen
 import com.example.androidAlarm.ui.screens.alarmTime.AlarmTimeViewModel
@@ -72,13 +74,33 @@ fun NavHost(navController: NavHostController) {
                 hiltViewModel<DesignatedDateViewModel>()
             DesignatedDateScreen(
                 designatedDateViewModel = designatedDateViewModel,
-                navigateToCalendar = { navController.navigate(AlarmDestination.CALENDAR.name) }
+                navigateToCalendar = { parameter ->
+                    navController.navigate(
+                        "${AlarmDestination.CALENDAR.name}/$parameter"
+                    )
+                }
             )
         }
-        composable(route = AlarmDestination.CALENDAR.name) {
-            CalendarScreen()
+        composable(
+            route = "${AlarmDestination.CALENDAR.name}/{parameter}",
+            arguments = listOf(
+                navArgument("value") {
+                    type = NavType.StringType
+                    defaultValue = "Default"
+                }
+            )
+        ) { backStackEntry ->
+            val designatedDateViewModel: DesignatedDateViewModel =
+                hiltViewModel<DesignatedDateViewModel>()
+            CalendarScreen(
+                designatedDateViewModel,
+                backStackEntry.arguments?.getString("parameter") ?: "",
+                navigateToDesignatedDate = {
+                    navController.navigate(AlarmDestination.DESIGNATED_DATE.name)
+                }
+            )
         }
-        composable(route = "${AlarmDestination.ALARM_TIME.name}/{alarmTime}") {
+        composable(route = AlarmDestination.ALARM_TIME.name) {
             val alarmTimeViewModel: AlarmTimeViewModel = hiltViewModel<AlarmTimeViewModel>()
             AlarmTimeScreen(
                 alarmTimeViewModel = alarmTimeViewModel,
