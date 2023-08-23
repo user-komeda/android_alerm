@@ -1,6 +1,7 @@
 package com.example.androidAlarm.ui.screens.config
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -30,7 +31,8 @@ import com.example.androidAlarm.model.ConfigItem
 @Composable
 fun ConfigScreen(
     configViewModel: ConfigViewModel,
-    navigateToDetailConfig: () -> Unit
+    navigateToDetailConfig: () -> Unit,
+    navigateToHome: () -> Unit
 ) {
     val uiState by configViewModel.uiState.collectAsState()
     val configItem = ConfigItem()
@@ -50,6 +52,13 @@ fun ConfigScreen(
             }
         }
     }
+
+    BackHandler(
+        enabled = true,
+        onBack = {
+            navigateToHome()
+        },
+    )
 }
 
 @Composable

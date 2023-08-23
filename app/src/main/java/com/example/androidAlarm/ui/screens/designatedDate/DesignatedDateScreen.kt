@@ -5,6 +5,7 @@ package com.example.androidAlarm.ui.screens.designatedDate
 import android.annotation.SuppressLint
 import android.os.Build
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -52,7 +53,8 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DesignatedDateScreen(
     designatedDateViewModel: DesignatedDateViewModel,
-    navigateToCalendar: (String) -> Unit
+    navigateToCalendar: (String) -> Unit,
+    navigateToHome: () -> Unit
 ) {
     val uiState by designatedDateViewModel.uiState.collectAsState()
     Scaffold(
@@ -101,6 +103,13 @@ fun DesignatedDateScreen(
                 uiState = uiState
             )
         }
+
+        BackHandler(
+            enabled = true,
+            onBack = {
+                navigateToHome()
+            },
+        )
     }
 }
 

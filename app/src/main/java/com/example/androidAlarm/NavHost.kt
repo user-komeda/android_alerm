@@ -55,19 +55,27 @@ fun NavHost(navController: NavHostController) {
             route = AlarmDestination.HOME_DETAIL.name
         ) {
             val detailViewModel: DetailViewModel = hiltViewModel<DetailViewModel>()
-            DetailScreen(detailViewModel = detailViewModel)
+            DetailScreen(detailViewModel = detailViewModel, navigateToHome = {
+                navController.navigate(AlarmDestination.HOME.name)
+            })
         }
         composable(route = AlarmDestination.CONFIG.name) {
             val configViewModel: ConfigViewModel = hiltViewModel<ConfigViewModel>()
             ConfigScreen(
                 configViewModel = configViewModel,
-                navigateToDetailConfig = { navController.navigate(AlarmDestination.CONFIG_DETAIL.name) }
+                navigateToDetailConfig = { navController.navigate(AlarmDestination.CONFIG_DETAIL.name) },
+                navigateToHome = {
+                    navController.navigate((AlarmDestination.HOME.name))
+                }
             )
         }
         composable(route = AlarmDestination.CONFIG_DETAIL.name) {
             val configDetailViewModel: ConfigDetailViewModel =
                 hiltViewModel<ConfigDetailViewModel>()
-            ConfigDetailScreen(configDetailViewModel = configDetailViewModel)
+            ConfigDetailScreen(
+                configDetailViewModel = configDetailViewModel,
+                navigateToConfig = { navController.navigate(AlarmDestination.CONFIG.name) }
+            )
         }
         composable(route = AlarmDestination.DESIGNATED_DATE.name) {
             val designatedDateViewModel: DesignatedDateViewModel =
@@ -78,6 +86,9 @@ fun NavHost(navController: NavHostController) {
                     navController.navigate(
                         "${AlarmDestination.CALENDAR.name}/$parameter"
                     )
+                },
+                navigateToHome = {
+                    navController.navigate(AlarmDestination.HOME.name)
                 }
             )
         }
@@ -100,7 +111,7 @@ fun NavHost(navController: NavHostController) {
                 }
             )
         }
-        composable(route = AlarmDestination.ALARM_TIME.name) {
+        composable(route = "${AlarmDestination.ALARM_TIME.name}/{alarmTime}") {
             val alarmTimeViewModel: AlarmTimeViewModel = hiltViewModel<AlarmTimeViewModel>()
             AlarmTimeScreen(
                 alarmTimeViewModel = alarmTimeViewModel,
