@@ -1,6 +1,7 @@
 package com.example.androidAlarm.ui.screens.configDetail
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +23,7 @@ import com.example.androidAlarm.model.ConfigDetailItem
 @Composable
 fun ConfigDetailScreen(
     configDetailViewModel: ConfigDetailViewModel,
+    navigateToConfig: () -> Unit
 ) {
     val uiState by configDetailViewModel.uiState.collectAsState()
     val configDetailItem = ConfigDetailItem()
@@ -35,6 +37,13 @@ fun ConfigDetailScreen(
             }
         }
     }
+
+    BackHandler(
+        enabled = true,
+        onBack = {
+            navigateToConfig()
+        },
+    )
 }
 
 @Composable

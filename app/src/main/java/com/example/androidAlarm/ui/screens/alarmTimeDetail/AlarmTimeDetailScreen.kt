@@ -5,6 +5,7 @@ package com.example.androidAlarm.ui.screens.alarmTimeDetail
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,12 @@ fun AlarmTimeDetailScreen(
     Scaffold {
         AlarmTimeDetail(uiState, alarmTimeDetailViewModel, navigateToHomeScreen)
     }
+
+    BackHandler(
+        enabled = false,
+        onBack = {
+        },
+    )
 }
 
 @RequiresApi(Build.VERSION_CODES.O)

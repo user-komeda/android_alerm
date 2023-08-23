@@ -1,6 +1,7 @@
 package com.example.androidAlarm.ui.screens.detail
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -22,7 +23,8 @@ import timber.log.Timber
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun DetailScreen(
-    detailViewModel: DetailViewModel
+    detailViewModel: DetailViewModel,
+    navigateToHome: () -> Unit
 ) {
     Timber.d(detailViewModel.toString())
     val detailConfigItem = DetailConfigItem()
@@ -37,6 +39,13 @@ fun DetailScreen(
             }
         }
     }
+
+    BackHandler(
+        enabled = true,
+        onBack = {
+            navigateToHome()
+        },
+    )
 }
 
 @Composable

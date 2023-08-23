@@ -5,6 +5,7 @@ package com.example.androidAlarm.ui.screens.alarmTime
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -53,6 +54,13 @@ fun AlarmTimeScreen(
             )
         }
     }
+
+    BackHandler(
+        enabled = true,
+        onBack = {
+            navigateToHomeScreen()
+        },
+    )
 }
 
 @Composable
