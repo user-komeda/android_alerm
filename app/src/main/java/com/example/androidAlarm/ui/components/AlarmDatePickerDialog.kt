@@ -33,20 +33,11 @@ fun AlarmDatePickerDialog(
         modifier = Modifier
             .fillMaxSize(),
         onDismissRequest = {
-//            designatedDateViewModel.updateShowDateTimePicker(false)
             onDismissRequest(false)
         },
         confirmButton = {
             TextButton(
                 onClick = {
-//                    designatedDateViewModel.updateShowDateTimePicker(false)
-//                    designatedDateViewModel.updateDesignatedObject(
-//                        LocalDateTime.ofInstant(
-//                            instant,
-//                            ZoneId.systemDefault()
-//                        ),
-//                        uiState.designatedDateName
-//                    )
                     onClickConfirmButton()
                 },
             ) {
@@ -56,7 +47,6 @@ fun AlarmDatePickerDialog(
         dismissButton = {
             TextButton(
                 onClick = {
-//                    designatedDateViewModel.updateShowDateTimePicker(false)
                     onCClickDismissButton(false)
                 }
             ) {

@@ -1,8 +1,7 @@
 package com.example.androidAlarm.model
 
 data class Alarm(
-    val resourceImageId: Int,
+    val id: Long,
     val alarmClock: String,
-    val repeatWeek: String? = null,
-    val isRepeat: Boolean = false
+    val isEnable: Boolean = false
 )
