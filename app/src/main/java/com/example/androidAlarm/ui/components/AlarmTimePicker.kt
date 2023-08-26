@@ -13,7 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +26,12 @@ import androidx.compose.ui.unit.dp
 
 @SuppressLint("RememberReturnType")
 @Composable
-fun AlarmTimePicker() {
+fun AlarmTimePicker(
+    onDismissRequest: () -> Unit,
+    confirmRequest: () -> Unit,
+    isShowTimePicker: Boolean,
+    timePickerState: TimePickerState
+) {
     var selectedHour by remember {
         mutableStateOf(0)
     }
@@ -35,16 +40,7 @@ fun AlarmTimePicker() {
         mutableStateOf(0) // or use  mutableStateOf(0)
     }
 
-    var showDialog by remember {
-        mutableStateOf(true)
-    }
-
-    val timePickerState = rememberTimePickerState(
-        initialHour = selectedHour,
-        initialMinute = selectedMinute
-    )
-
-    if (showDialog) {
+    if (isShowTimePicker) {
         AlertDialog(
             modifier = Modifier
                 .fillMaxWidth()
@@ -52,7 +48,7 @@ fun AlarmTimePicker() {
                     color = MaterialTheme.colorScheme.surface,
                     shape = RoundedCornerShape(size = 12.dp)
                 ),
-            onDismissRequest = { showDialog = false }
+            onDismissRequest = { onDismissRequest() }
         ) {
             Column(
                 modifier = Modifier
@@ -74,16 +70,17 @@ fun AlarmTimePicker() {
                     horizontalArrangement = Arrangement.End
                 ) {
                     // dismiss button
-                    TextButton(onClick = { showDialog = false }) {
+                    TextButton(onClick = { onDismissRequest() }) {
                         Text(text = "Dismiss")
                     }
 
                     // confirm button
                     TextButton(
                         onClick = {
-                            showDialog = false
+                            onDismissRequest()
                             selectedHour = timePickerState.hour
                             selectedMinute = timePickerState.minute
+                            confirmRequest()
                         }
                     ) {
                         Text(text = "Confirm")

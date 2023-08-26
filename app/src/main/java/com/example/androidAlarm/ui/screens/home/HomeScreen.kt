@@ -2,6 +2,8 @@
 
 package com.example.androidAlarm.ui.screens.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,8 +49,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidAlarm.model.Alarm
 import com.example.androidAlarm.model.HomeModalItem
+import com.example.androidAlarm.ui.components.AlarmTimePicker
 import com.example.androidalerm.R
+import java.time.LocalTime
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
@@ -58,6 +64,10 @@ fun HomeScreen(
 
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
+    val timePickerState = rememberTimePickerState(
+        initialHour = 0,
+        initialMinute = 0
+    )
 
     Scaffold(topBar = {
         AppBar(
@@ -73,12 +83,12 @@ fun HomeScreen(
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 item {
                     Divider()
-                    HomeItem()
+                    HomeItem(homeViewModel)
                     Divider()
                 }
-                items(1) { alarm ->
+                items(uiState.alarmList) { alarm ->
                     HomeListItem(
-                        alarm = null,
+                        alarm = alarm,
                         onClickItem = navigateToDetail
                     )
                     Divider()
@@ -92,10 +102,23 @@ fun HomeScreen(
                 navigateToAlarmTime = navigateToAlarmTime
             )
         }
-//        AlarmTimePicker()
+        AlarmTimePicker(
+            onDismissRequest = { homeViewModel.updateShowTimePickerFlag(false) },
+            confirmRequest = {
+                homeViewModel.updateAlarmList(
+                    LocalTime.of(
+                        timePickerState.hour,
+                        timePickerState.minute
+                    )
+                )
+            },
+            isShowTimePicker = uiState.isShowTimePicker,
+            timePickerState = timePickerState
+        )
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 private fun AppBar(
@@ -180,26 +203,31 @@ private fun BottomBar() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun HomeItem() {
+private fun HomeItem(
+    homeViewModel: HomeViewModel
+) {
     Column {
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
-                .fillMaxWidth().clickable { }
+                .fillMaxWidth()
+                .clickable { homeViewModel.updateShowTimePickerFlag(true) }
         ) {
             Icon(
                 Icons.Outlined.Add,
-                contentDescription = " stringResource(id = R.string.shopping_cart_content_desc)"
+                contentDescription = " stringResource(id = R.string.shopping_cart_content_desc)",
+                modifier = Modifier.size(50.dp)
             )
-            Text(text = "アラームの追加")
+            Text(text = "アラームの追加", fontSize = 28.sp)
         }
     }
 }
 
 @Composable
 private fun HomeListItem(
-    alarm: Alarm?,
+    alarm: Alarm,
     onClickItem: () -> Unit
 ) {
     Row(
@@ -212,10 +240,11 @@ private fun HomeListItem(
             painter = painterResource(id = R.drawable.icons8_clock),
             contentDescription = "時計アイコン"
         )
-        Text(text = "8:35", Modifier.padding(start = 10.dp), fontSize = 28.sp)
+        Text(text = alarm.alarmClock, Modifier.padding(start = 10.dp), fontSize = 28.sp)
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun HomeModalView(
     homeViewModel: HomeViewModel,

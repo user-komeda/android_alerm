@@ -5,8 +5,11 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
+import com.example.androidAlarm.model.Alarm
 import com.example.androidAlarm.util.AlarmBroadcastReceiver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,9 +17,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import javax.inject.Inject
 
+@RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class HomeViewModel @Inject constructor() : ViewModel() {
 
@@ -36,6 +42,30 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         _uiState.update {
             it.copy(
                 isShowModal = !_uiState.value.isShowModal
+            )
+        }
+    }
+
+    fun updateShowTimePickerFlag(flag: Boolean) {
+        _uiState.update {
+            it.copy(
+                isShowTimePicker = flag
+            )
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateAlarmList(alarmTime: LocalTime) {
+        val alarmList = _uiState.value.alarmList.toMutableList()
+        alarmList.add(
+            Alarm(
+                alarmClock = alarmTime.format(DateTimeFormatter.ofPattern("hh:mm")),
+                isEnable = false
+            )
+        )
+        _uiState.update {
+            it.copy(
+                alarmList = alarmList
             )
         }
     }
