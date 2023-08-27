@@ -3,6 +3,7 @@ package com.example.androidAlarm.data.room.di
 import android.app.Application
 import androidx.room.Room
 import com.example.androidAlarm.data.room.AndroidAlarmDataBse
+import com.example.androidAlarm.data.room.dao.AlarmDao
 import com.example.androidAlarm.data.room.dao.DesignatedDaysDao
 import com.example.androidAlarm.data.room.dao.DesignatedDaysKeyDao
 import dagger.Module
@@ -36,5 +37,10 @@ object DataBaseModule {
     @Provides
     fun provideDesignatedDaysKeyDao(db: AndroidAlarmDataBse): DesignatedDaysKeyDao {
         return db.getDesignatedDaysKeyDao()
+    }
+
+    @Provides
+    fun provideAlarmDao(db: AndroidAlarmDataBse): AlarmDao {
+        return db.getAlarmDao()
     }
 }

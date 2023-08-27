@@ -105,7 +105,7 @@ fun HomeScreen(
         AlarmTimePicker(
             onDismissRequest = { homeViewModel.updateShowTimePickerFlag(false) },
             confirmRequest = {
-                homeViewModel.updateAlarmList(
+                homeViewModel.addAlarmList(
                     LocalTime.of(
                         timePickerState.hour,
                         timePickerState.minute
