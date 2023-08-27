@@ -9,6 +9,10 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.androidAlarm.data.entity.AlarmEntity
+import com.example.androidAlarm.domain.usecase.AddAlarmUseCase
+import com.example.androidAlarm.domain.usecase.GetAlarmUseCase
 import com.example.androidAlarm.model.Alarm
 import com.example.androidAlarm.util.AlarmBroadcastReceiver
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,18 +20,27 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import javax.inject.Inject
+import kotlin.streams.toList
 
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val getAlarmUseCase: GetAlarmUseCase,
+    private val addAlarmUseCase: AddAlarmUseCase
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeState())
     val uiState: StateFlow<HomeState> = _uiState.asStateFlow()
+
+    init {
+        getAlarm()
+    }
 
     fun update() {
         _uiState.update {
@@ -55,19 +68,13 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun updateAlarmList(alarmTime: LocalTime) {
-        val alarmList = _uiState.value.alarmList.toMutableList()
-        alarmList.add(
+    fun addAlarmList(alarmTime: LocalTime) {
+        addAlarm(
             Alarm(
                 alarmClock = alarmTime.format(DateTimeFormatter.ofPattern("hh:mm")),
                 isEnable = false
             )
         )
-        _uiState.update {
-            it.copy(
-                alarmList = alarmList
-            )
-        }
     }
 
     fun selectTime(selectTime: Int, context: Context) {
@@ -101,6 +108,30 @@ class HomeViewModel @Inject constructor() : ViewModel() {
             Timber.d("CCCCCCCCCCCCCCCCCCCC")
             alarm.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
             ContextCompat.startForegroundService(context, intent)
+        }
+    }
+
+    private fun getAlarm() = viewModelScope.launch {
+        val alarmListEntity: List<AlarmEntity> = getAlarmUseCase.invoke()
+        val alarmList: List<Alarm> = alarmListEntity.stream().map {
+            Alarm(it.id, it.alarmTime, it.isEnable)
+        }.toList()
+
+        _uiState.update {
+            it.copy(
+                alarmList = alarmList
+            )
+        }
+    }
+
+    private fun addAlarm(alarm: Alarm) = viewModelScope.launch {
+        val registerId: Long = addAlarmUseCase.invoke(alarm)
+        val copyList: MutableList<Alarm> = _uiState.value.alarmList.toMutableList()
+        copyList.add(Alarm(registerId, alarm.alarmClock, alarm.isEnable))
+        _uiState.update {
+            it.copy(
+                alarmList = copyList
+            )
         }
     }
 }
