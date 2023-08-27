@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import com.example.androidAlarm.model.Alarm
 import com.example.androidAlarm.model.DropDownItem
 import java.time.LocalTime
+
 @RequiresApi(Build.VERSION_CODES.O)
 data class HomeState constructor(
     val isShowDropDownMenu: Boolean = false,
@@ -13,5 +14,6 @@ data class HomeState constructor(
     val isShowModal: Boolean = false,
     val selectedAlarmTime: Int = 0,
     val isShowTimePicker: Boolean = false,
-    val alarmTime: LocalTime = LocalTime.now()
+    val alarmTime: LocalTime = LocalTime.now(),
+    val alarmIsEnable: Boolean = false
 )

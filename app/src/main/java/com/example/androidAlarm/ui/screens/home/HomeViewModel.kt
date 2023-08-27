@@ -67,6 +67,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun updateAlarmEnableFlag() {
+        _uiState.update {
+            it.copy(
+                alarmIsEnable = !_uiState.value.alarmIsEnable
+            )
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun addAlarmList(alarmTime: LocalTime) {
         addAlarm(
@@ -110,6 +118,39 @@ class HomeViewModel @Inject constructor(
             ContextCompat.startForegroundService(context, intent)
         }
     }
+
+//    @SuppressLint("ScheduleExactAlarm")
+//    private fun startAlarm(context: Context, selectTime: LocalTime) {
+//        val calendar: Calendar = Calendar.getInstance()
+//        calendar.timeInMillis = System.currentTimeMillis()
+//        calendar.add(Calendar.SECOND, convertLocalTimeToSecond(selectTime))
+//        val intent: Intent = Intent(context, AlarmBroadcastReceiver::class.java)
+//        val pendingIntent: PendingIntent = PendingIntent.getBroadcast(
+//            context,
+//            1,
+//            intent,
+//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+//        )
+//        ContextCompat.getSystemService(
+//            context,
+//            AlarmManager::class.java
+//        )?.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+//        ContextCompat.startForegroundService(context, intent)
+//    }
+//
+//    private fun cancelAlarm(context: Context) {
+//        val intent: Intent = Intent(context, AlarmBroadcastReceiver::class.java)
+//        val pendingIntent: PendingIntent = PendingIntent.getBroadcast(
+//            context,
+//            1,
+//            intent,
+//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+//        )
+//        ContextCompat.getSystemService(
+//            context,
+//            AlarmManager::class.java
+//        )?.cancel(pendingIntent)
+//    }
 
     private fun getAlarm() = viewModelScope.launch {
         val alarmListEntity: List<AlarmEntity> = getAlarmUseCase.invoke()
