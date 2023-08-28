@@ -15,7 +15,7 @@ import javax.inject.Provider
 
 @Database(
     entities = [DesignatedDaysEntity::class, DesignatedDaysKeyEntity::class, AlarmEntity::class],
-    version = 8
+    version = 9
 )
 abstract class AndroidAlarmDataBse : RoomDatabase() {
     abstract fun getDesignatedDaysDao(): DesignatedDaysDao

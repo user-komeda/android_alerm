@@ -65,8 +65,9 @@ fun HomeScreen(
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
     val timePickerState = rememberTimePickerState(
-        initialHour = 0,
-        initialMinute = 0
+        initialHour = LocalTime.now().hour,
+        initialMinute = LocalTime.now().minute,
+        is24Hour = true
     )
 
     Scaffold(topBar = {
@@ -241,10 +242,10 @@ private fun HomeListItem(
             .padding(16.dp)
             .fillMaxWidth()
     ) {
-        IconButton(onClick = { homeViewModel.updateAlarmEnableFlag() }) {
+        IconButton(onClick = { homeViewModel.updateAlarmEnableFlag(alarm) }) {
             Image(
                 painter = painterResource(
-                    id = if (uiState.alarmIsEnable) {
+                    id = if (alarm.isEnable) {
                         R.drawable.icons8_alarm_642
                     } else {
                         R.drawable.icons8_alarm_641

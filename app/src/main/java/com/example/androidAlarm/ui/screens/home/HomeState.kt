@@ -15,5 +15,5 @@ data class HomeState constructor(
     val selectedAlarmTime: Int = 0,
     val isShowTimePicker: Boolean = false,
     val alarmTime: LocalTime = LocalTime.now(),
-    val alarmIsEnable: Boolean = false
+    val requestCode: Int = 0,
 )
