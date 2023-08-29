@@ -76,7 +76,10 @@ class HomeViewModel @Inject constructor(
         val filteredAlarm = copyList.filter {
             it.id == alarm.id
         }[0]
-        val removeIndex = (alarm.id - 1).toInt()
+        Timber.d(alarm.toString())
+        Timber.d(filteredAlarm.toString())
+        Timber.d(copyList.size.toString())
+        val removeIndex = (filteredAlarm.alarmRequestCode - 1)
         copyList.removeAt(removeIndex)
         copyList.add(
             removeIndex,
@@ -115,9 +118,11 @@ class HomeViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun addAlarmList(alarmTime: LocalTime) {
         updateAlarmRequestCode()
+        Timber.d(_uiState.value.requestCode.toString())
+//        Timber.d(alarmTime.format(DateTimeFormatter.ofPattern("HH:mm")))
         addAlarm(
             Alarm(
-                alarmClock = alarmTime.format(DateTimeFormatter.ofPattern("hh:mm")),
+                alarmClock = alarmTime.format(DateTimeFormatter.ofPattern("HH:mm")),
                 alarmRequestCode = _uiState.value.requestCode,
                 isEnable = false
             )
@@ -144,6 +149,9 @@ class HomeViewModel @Inject constructor(
         calendar.timeInMillis = System.currentTimeMillis()
         val nawSecond = convertLocalTimeToSecond(LocalTime.now())
         val selectTimeSecond = convertLocalTimeToSecond(selectTime)
+        if (selectTimeSecond < nawSecond) {
+            selectTimeSecond + 24
+        }
         calendar.add(Calendar.SECOND, selectTimeSecond - nawSecond)
         val intent: Intent = Intent(context, AlarmBroadcastReceiver::class.java)
         val pendingIntent: PendingIntent = PendingIntent.getBroadcast(
@@ -184,8 +192,15 @@ class HomeViewModel @Inject constructor(
 
         _uiState.update {
             it.copy(
-                alarmList = alarmList
+                alarmList = alarmList,
             )
+        }
+        if (alarmList.isNotEmpty()) {
+            _uiState.update {
+                it.copy(
+                    requestCode = alarmList.last().alarmRequestCode
+                )
+            }
         }
     }
 
@@ -202,7 +217,7 @@ class HomeViewModel @Inject constructor(
         )
         _uiState.update {
             it.copy(
-                alarmList = copyList
+                alarmList = copyList,
             )
         }
     }

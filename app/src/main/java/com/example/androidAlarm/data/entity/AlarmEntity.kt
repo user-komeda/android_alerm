@@ -2,12 +2,14 @@ package com.example.androidAlarm.data.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.androidAlarm.model.Alarm
 import javax.annotation.concurrent.Immutable
 
 @Entity(
     tableName = "alarm",
+    indices = [Index(value = ["alarmRequestCode"], unique = true)]
 )
 @Immutable
 data class AlarmEntity(
