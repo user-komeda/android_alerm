@@ -65,8 +65,9 @@ fun HomeScreen(
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
     val timePickerState = rememberTimePickerState(
-        initialHour = 0,
-        initialMinute = 0
+        initialHour = LocalTime.now().hour,
+        initialMinute = LocalTime.now().minute,
+        is24Hour = true
     )
 
     Scaffold(topBar = {
@@ -89,7 +90,9 @@ fun HomeScreen(
                 items(uiState.alarmList) { alarm ->
                     HomeListItem(
                         alarm = alarm,
-                        onClickItem = navigateToDetail
+                        onClickItem = navigateToDetail,
+                        homeViewModel = homeViewModel,
+                        uiState = uiState
                     )
                     Divider()
                 }
@@ -182,7 +185,7 @@ private fun BottomBar() {
         ) {
             IconButton(onClick = { }) {
                 Image(
-                    painter = painterResource(id = R.drawable.icons8_clock),
+                    painter = painterResource(id = R.drawable.icons8_alarm_642),
                     contentDescription = "時計アイコン"
                 )
             }
@@ -225,10 +228,13 @@ private fun HomeItem(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun HomeListItem(
     alarm: Alarm,
-    onClickItem: () -> Unit
+    onClickItem: () -> Unit,
+    homeViewModel: HomeViewModel,
+    uiState: HomeState
 ) {
     Row(
         modifier = Modifier
@@ -236,10 +242,18 @@ private fun HomeListItem(
             .padding(16.dp)
             .fillMaxWidth()
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.icons8_clock),
-            contentDescription = "時計アイコン"
-        )
+        IconButton(onClick = { homeViewModel.updateAlarmEnableFlag(alarm) }) {
+            Image(
+                painter = painterResource(
+                    id = if (alarm.isEnable) {
+                        R.drawable.icons8_alarm_642
+                    } else {
+                        R.drawable.icons8_alarm_641
+                    }
+                ),
+                contentDescription = "時計アイコン"
+            )
+        }
         Text(text = alarm.alarmClock, Modifier.padding(start = 10.dp), fontSize = 28.sp)
     }
 }

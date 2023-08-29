@@ -153,6 +153,6 @@ constructor(
     }
 
     private fun convertLocalTimeToSecond(localTime: LocalTime): Int {
-        return localTime.hour * 3600 * localTime.minute * 60 + localTime.second
+        return (localTime.hour * 3600) + (localTime.minute * 60) + localTime.second
     }
 }

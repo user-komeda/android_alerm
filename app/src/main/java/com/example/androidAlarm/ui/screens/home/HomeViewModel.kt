@@ -1,14 +1,17 @@
+@file:Suppress("MagicNumber", "TooManyFunctions")
+
 package com.example.androidAlarm.ui.screens.home
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
+import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidAlarm.data.entity.AlarmEntity
 import com.example.androidAlarm.domain.usecase.AddAlarmUseCase
@@ -31,9 +34,10 @@ import kotlin.streams.toList
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val application: Application,
     private val getAlarmUseCase: GetAlarmUseCase,
     private val addAlarmUseCase: AddAlarmUseCase
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(HomeState())
     val uiState: StateFlow<HomeState> = _uiState.asStateFlow()
@@ -67,36 +71,92 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun updateAlarmEnableFlag(alarm: Alarm) {
+        val copyList = _uiState.value.alarmList.toMutableList()
+        val filteredAlarm = copyList.filter {
+            it.id == alarm.id
+        }[0]
+        Timber.d(alarm.toString())
+        Timber.d(filteredAlarm.toString())
+        Timber.d(copyList.size.toString())
+        val removeIndex = (filteredAlarm.alarmRequestCode - 1)
+        copyList.removeAt(removeIndex)
+        copyList.add(
+            removeIndex,
+            Alarm(
+                filteredAlarm.id,
+                filteredAlarm.alarmClock,
+                filteredAlarm.alarmRequestCode,
+                !filteredAlarm.isEnable
+            )
+        )
+        if (filteredAlarm.isEnable) {
+            cancelAlarm(context = application.applicationContext, alarm.alarmRequestCode)
+        } else {
+            setAlarm(
+                LocalTime.parse(alarm.alarmClock),
+                application.applicationContext,
+                alarm.alarmRequestCode
+            )
+        }
+
+        _uiState.update {
+            it.copy(
+                alarmList = copyList
+            )
+        }
+    }
+
+    private fun updateAlarmRequestCode() {
+        _uiState.update {
+            it.copy(
+                requestCode = _uiState.value.requestCode + 1
+            )
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun addAlarmList(alarmTime: LocalTime) {
+        updateAlarmRequestCode()
+        Timber.d(_uiState.value.requestCode.toString())
+//        Timber.d(alarmTime.format(DateTimeFormatter.ofPattern("HH:mm")))
         addAlarm(
             Alarm(
-                alarmClock = alarmTime.format(DateTimeFormatter.ofPattern("hh:mm")),
+                alarmClock = alarmTime.format(DateTimeFormatter.ofPattern("HH:mm")),
+                alarmRequestCode = _uiState.value.requestCode,
                 isEnable = false
             )
         )
     }
 
     fun selectTime(selectTime: Int, context: Context) {
+        updateAlarmRequestCode()
         _uiState.update {
             it.copy(
                 selectedAlarmTime = selectTime
             )
         }
-        Timber.d(selectTime.toString())
-        setAlarm(selectTime, context)
+        setAlarm(
+            LocalTime.now().plusSeconds(selectTime.toLong()),
+            context,
+            _uiState.value.requestCode
+        )
     }
 
     @SuppressLint("ScheduleExactAlarm")
-    private fun setAlarm(selectTime: Int, context: Context) {
-        Timber.d("aaaaaaaaaaaaa")
+    private fun setAlarm(selectTime: LocalTime, context: Context, requestCode: Int) {
         val calendar: Calendar = Calendar.getInstance()
         calendar.timeInMillis = System.currentTimeMillis()
-        calendar.add(Calendar.SECOND, selectTime)
+        val nawSecond = convertLocalTimeToSecond(LocalTime.now())
+        val selectTimeSecond = convertLocalTimeToSecond(selectTime)
+        if (selectTimeSecond < nawSecond) {
+            selectTimeSecond + 24
+        }
+        calendar.add(Calendar.SECOND, selectTimeSecond - nawSecond)
         val intent: Intent = Intent(context, AlarmBroadcastReceiver::class.java)
         val pendingIntent: PendingIntent = PendingIntent.getBroadcast(
             context,
-            1,
+            requestCode,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -105,33 +165,64 @@ class HomeViewModel @Inject constructor(
             AlarmManager::class.java
         )
         if (alarm != null) {
-            Timber.d("CCCCCCCCCCCCCCCCCCCC")
             alarm.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
             ContextCompat.startForegroundService(context, intent)
         }
     }
 
+    private fun cancelAlarm(context: Context, requestCode: Int) {
+        val intent: Intent = Intent(context, AlarmBroadcastReceiver::class.java)
+        val pendingIntent: PendingIntent = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        ContextCompat.getSystemService(
+            context,
+            AlarmManager::class.java
+        )?.cancel(pendingIntent)
+    }
+
     private fun getAlarm() = viewModelScope.launch {
         val alarmListEntity: List<AlarmEntity> = getAlarmUseCase.invoke()
         val alarmList: List<Alarm> = alarmListEntity.stream().map {
-            Alarm(it.id, it.alarmTime, it.isEnable)
+            Alarm(it.id, it.alarmTime, it.alarmRequestCode, it.isEnable)
         }.toList()
 
         _uiState.update {
             it.copy(
-                alarmList = alarmList
+                alarmList = alarmList,
             )
+        }
+        if (alarmList.isNotEmpty()) {
+            _uiState.update {
+                it.copy(
+                    requestCode = alarmList.last().alarmRequestCode
+                )
+            }
         }
     }
 
     private fun addAlarm(alarm: Alarm) = viewModelScope.launch {
         val registerId: Long = addAlarmUseCase.invoke(alarm)
         val copyList: MutableList<Alarm> = _uiState.value.alarmList.toMutableList()
-        copyList.add(Alarm(registerId, alarm.alarmClock, alarm.isEnable))
+        copyList.add(
+            Alarm(
+                registerId,
+                alarm.alarmClock,
+                alarmRequestCode = alarm.alarmRequestCode,
+                alarm.isEnable
+            )
+        )
         _uiState.update {
             it.copy(
-                alarmList = copyList
+                alarmList = copyList,
             )
         }
+    }
+
+    private fun convertLocalTimeToSecond(localTime: LocalTime): Int {
+        return (localTime.hour * 3600) + (localTime.minute * 60) + localTime.second
     }
 }
